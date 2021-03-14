@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-convoapp-dev-123418-authRole",
+      "UnauthRoleArn": "arn:aws:iam::993124166330:role/amplify-convoapp-dev-123418-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::993124166330:role/amplify-convoapp-dev-123418-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-convoapp-dev-123418-deployment",
+      "UnauthRoleName": "amplify-convoapp-dev-123418-unauthRole",
+      "StackName": "amplify-convoapp-dev-123418",
+      "StackId": "arn:aws:cloudformation:us-east-1:993124166330:stack/amplify-convoapp-dev-123418/2cf53ed0-8359-11eb-b5f8-0e9182e4a795",
+      "AmplifyAppId": "d1gzkkdez8wqpd"
+    }
+  }
+}
