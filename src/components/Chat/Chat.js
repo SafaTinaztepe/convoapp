@@ -21,10 +21,22 @@ const Chat = ({ location }) => {
     const { name, room } = queryString.parse(location.search);
 
     setRoom(room);
-    setName(name);
+    // setName(name);
+    setIpAsName();
     setUsers([{name, room}])
 
   }, [location.search]);
+
+  const setIpAsName = () => {
+    axios.get('https://api.ipify.org?format=json')
+          .then(function (response) {
+            return response.json();
+          }).then(function (response) {
+            setName(response['ip']);
+          }).catch(function (err){
+            console.error('Problem fetching my IP', err);
+          });
+  }
 
 
   const sanitizeString = (str) => {
@@ -45,10 +57,8 @@ const Chat = ({ location }) => {
       axios.get(`https://re5zpou70i.execute-api.us-east-1.amazonaws.com/api/convo/?prompt=${prompt}`)
         .then(function (response) {
           // handle success
-          var data = response.data.api.choices[0].text.split("Convo:")[1];
+          var data = response.data.api.choices[0].text.split("Convo:")[1]+".";
           setMessages(messages => [ ...messages, {text:data, user:'convo'} ]);
-          // document.getElementById("responsearea").value = data;
-
         })
         .catch(function (error) {
           // handle error
@@ -65,7 +75,7 @@ const Chat = ({ location }) => {
           <Messages messages={messages} name={name} />
           <Input message={message} setMessage={setMessage} sendMessage={sendMessage} />
       </div>
-      <TextContainer users={users}/>
+      <TextContainer setMessage={setMessage} sendMessage={sendMessage} />
     </div>
   );
 }
