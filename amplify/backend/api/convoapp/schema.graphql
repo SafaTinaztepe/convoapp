@@ -1,0 +1,6 @@
+type ApiCall @model {
+  id: ID!
+  user: String!
+  message: String!
+  response: String
+}

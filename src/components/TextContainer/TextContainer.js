@@ -23,7 +23,6 @@ const TextContainer = (props) => (
       <ul>
         {
           presets.map((preset,i) => {
-            console.log(preset)
             return(<li key={i}><button onClick={(event) => sendPresetMessage(event, props.setMessage, props.sendMessage)} className="messageBox backgroundOrange"><span className="messageText">{preset}</span></button></li>)
           })
         }

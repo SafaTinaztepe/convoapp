@@ -25,3 +25,7 @@ input:focus, textarea:focus, select:focus{
   border: none;
   width: 20%;
 }
+
+.disabled {
+  background: rgb(200, 200, 200);
+}

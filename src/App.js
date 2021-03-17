@@ -5,6 +5,12 @@ import Join from './components/Join/Join';
 
 import { BrowserRouter as Router, Route } from "react-router-dom";
 
+import Amplify, { API, graphqlOperation } from 'aws-amplify';
+import awsconfig from './aws-exports';
+
+Amplify.configure(awsconfig);
+API.configure(awsconfig);
+
 const App = () => {
   return (
     <Router>
