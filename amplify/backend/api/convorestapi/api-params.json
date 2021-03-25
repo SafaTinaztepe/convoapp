@@ -1,0 +1,35 @@
+{
+    "paths": [
+        {
+            "name": "/convo",
+            "lambdaFunction": "convolambda",
+            "privacy": {
+                "open": true
+            },
+            "policyResourceName": "/convo"
+        }
+    ],
+    "resourceName": "convorestapi",
+    "apiName": "convorestapi",
+    "functionArns": [
+        {
+            "lambdaFunction": "convolambda"
+        }
+    ],
+    "privacy": {
+        "auth": 0,
+        "unauth": 0,
+        "authRoleName": "amplify-convoapp-dev-123418-authRole",
+        "unAuthRoleName": "amplify-convoapp-dev-123418-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "convolambda",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ]
+}

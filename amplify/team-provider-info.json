@@ -10,6 +10,14 @@
       "StackName": "amplify-convoapp-dev-123418",
       "StackId": "arn:aws:cloudformation:us-east-1:993124166330:stack/amplify-convoapp-dev-123418/2cf53ed0-8359-11eb-b5f8-0e9182e4a795",
       "AmplifyAppId": "d1gzkkdez8wqpd"
+    },
+    "categories": {
+      "function": {
+        "convolambda": {
+          "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
+          "s3Key": "amplify-builds/convolambda-596a2f59793768475067-build.zip"
+        }
+      }
     }
   }
 }

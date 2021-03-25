@@ -1,0 +1,12 @@
+{
+  "lambdaLayers": [],
+  "permissions": {
+    "api": {
+      "convoapp": [
+        "Query",
+        "Mutation",
+        "Subscription"
+      ]
+    }
+  }
+}
