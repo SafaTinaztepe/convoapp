@@ -7,10 +7,13 @@ import boto3
 import requests
 import datetime as dt
 import openai
+import json
 
 headers = {
-    "host"     : os.environ["API_CONVOAPP_GRAPHQLAPIENDPOINTOUTPUT"].replace("https://", ""),
-    "x-api-key": os.environ["API_CONVOAPP_GRAPHQLAPIKEYOUTPUT"]
+    "host"     : os.environ["API_CONVOAPP_GRAPHQLAPIENDPOINTOUTPUT"].replace("https://", "").replace("/graphql", ""),
+    "x-api-key": os.environ["API_CONVOAPP_GRAPHQLAPIKEYOUTPUT"],
+    "content-type": "application/json",
+    "Access-Control-Allow-Origin": "*"
 }
 
 def handler(event, context):
@@ -38,27 +41,37 @@ def handler(event, context):
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0,
-        stop=['.']
+        stop=['.', '!', '?']
     )
-    # content filtration
+    
+    response = None
+    responses = response["choices"][0]["text"].split("Convo: ")
+    if len(responses) >= 1:
+        response = responses[0] + "."
+    else:
+        response = "I have no idea what you just said."
+
+    # content filtration model 
 
     if create_api_call_db(user, prompt, response):
         print("Wrote Message")
     else:
         print("Failed")
     
-
-    return {"api": response}
-
-def filter_user_by_restrictions(user):
-    user_hour_messages = count_queries_by_user_time(user, grain={'hours':1})
-    user_min_messages  = count_queries_by_user_time(user, grain={'minutes':1})
-    return user_hour_messages >= 180 or user_min_messages >= 6
+    # Lambda proxy integration
+    # means we have to send the entire response object from Lambda
+    return {
+        "statusCode": 200,
+        "headers": {
+            "access-control-allow-origin": "*"
+        },
+        "body": json.dumps(response),
+        "isBase64Encoded": False
+    }
 
 def create_api_call_db(user, message, response):
 
     mutation = None
-
     with open("gql/mutations/create.txt", "r") as infile:
         mutation = infile.read()
 
@@ -69,7 +82,7 @@ def create_api_call_db(user, message, response):
     }
 
     response = None
-    request = requests.post(os.environ['API_CONVOAPP_GRAPHQLAPIENDPOINTOUTPUT'], json={'mutation': mutation, 'variables':{'input':ApiCall}}, headers=headers)
+    request = requests.post(os.environ['API_CONVOAPP_GRAPHQLAPIENDPOINTOUTPUT'], json={'query': mutation, 'variables':{'input':ApiCall}}, headers=headers)
     if request.status_code == 200:
         response = request.json()
     else:
@@ -78,6 +91,11 @@ def create_api_call_db(user, message, response):
         raise Exception("Query failed to run by returning code of {}. {}".format(request.status_code, mutation))
 
     return response
+
+def filter_user_by_restrictions(user):
+    user_hour_messages = count_queries_by_user_time(user, grain={'hours':1})
+    user_min_messages  = count_queries_by_user_time(user, grain={'minutes':1})
+    return user_hour_messages >= 180 or user_min_messages >= 6
 
 def count_queries_by_user_time(user, grain):
 # 6 generations/minute, 180 generations/hour

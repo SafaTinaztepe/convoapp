@@ -37,7 +37,7 @@ const Chat = ({ location }) => {
 
 
   const sanitizeString = (str) => {
-    str = str.replace(/[^A-Za-z0-9áéíóúñü\?\! \.,_-]/gim,"");
+    str = str.replace(/[^A-Za-z0-9áéíóúñü\?\! \.,_-]/gim, "").replace("User: ", "").replace("Convo: ", "");
     return str.trim();
   }
 
@@ -45,45 +45,33 @@ const Chat = ({ location }) => {
     event.preventDefault();
     
     if(message && !chatIsDisabled) {
-
+      
+      var payload, err;
       prompt = sanitizeString(message);
       
       setMessages(messages => [ ...messages, {text:message, user:name} ]);
       setMessage("");
       setChatIsDisabled(true);
-      var payload, err;
-      // axios.get(`https://re5zpou70i.execute-api.us-east-1.amazonaws.com/api/convo/?prompt=${prompt}`)
-      //   .then(function (response) {
-      //     // handle success
-      //     response = response.data.api.choices[0].text.split("Convo:")[1];
-      //     if(response == "undefined")
-      //       payload = "I'm sorry, I didn't get that.";
-      //     else
-      //       payload = response + "."
-      //   })
-      //   .catch(function (error) {
-      //     // handle error
-      //     err = error;
-      //     console.log(error.toJSON());
-      //     payload = "Damn I got an error.";
-      //   })
-      //   .then(() => {
-      //     console.log(payload);
-      //     setMessages(messages => [ ...messages, {text:payload, user:'convo'} ]);
-      //     setChatIsDisabled(false);
-      //     const ApiCall = {user:name, message:(err?err:prompt), response:payload}
-      //     API.graphql(graphqlOperation(createApiCall, {input: ApiCall}))
-      //        .then(() => {console.log("Stored Message")})
-      //        .catch(() => {console.log("Error Storing Message")})
-      //   })
 
       API.get("convorestapi", '/convo', {'queryStringParameters': {'prompt': prompt, 'name':name}})
-         .then((response) => {
-           console.log(response)
+        .then((response) => {
+          // handle success
+          payload = (
+            response === "undefined" ?
+            "Sorry, I didn't get that." :
+            response
+          )
          })
-         .catch((err) => {
-           console.error(err);
-         })
+        .catch(function (error) {
+          // handle error
+          err = error;
+          console.log(error.toJSON());
+          payload = "Damn I got an error " + err.toJSON();
+        })
+        .then(() => {
+          setMessages(messages => [ ...messages, {text:payload, user:'convo'} ]);
+          setChatIsDisabled(false);
+        })
     }
   }
 
