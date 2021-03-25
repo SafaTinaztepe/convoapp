@@ -19,6 +19,13 @@ headers = {
 def handler(event, context):
     print('Event:', event)
 
+    prompt = event["queryStringParameters"]["prompt"]
+    user = event["queryStringParameters"]["name"]
+
+    # if filter_user_by_restrictions(user):
+    #     return "Block user" but in lambda request form    
+
+
     ssm = boto3.client("ssm")
     api_key = ssm.get_parameter(Name="openai_api_key", WithDecryption=True)['Parameter']['Value']
     openai.api_key = api_key
@@ -27,8 +34,7 @@ def handler(event, context):
         training_text = infile.read()
 
     # request = app.current_request
-    prompt = event["queryStringParameters"]["prompt"]
-    user = event["queryStringParameters"]["name"]
+
     training_text = f"{training_text}\nUser:{prompt}"
     print(user)
     print(prompt)
