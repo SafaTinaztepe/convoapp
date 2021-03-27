@@ -64,9 +64,10 @@ const Chat = ({ location }) => {
          })
         .catch(function (error) {
           // handle error
-          err = error;
           console.log(error.toJSON());
-          payload = "Damn I got an error " + err.toJSON();
+          console.log(error.response);
+
+          payload = "I got an error: ";
         })
         .then(() => {
           setMessages(messages => [ ...messages, {text:payload, user:'convo'} ]);

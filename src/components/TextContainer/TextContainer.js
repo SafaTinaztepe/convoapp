@@ -16,7 +16,7 @@ const TextContainer = (props) => (
   
   <div className="textContainer">
     <div>
-      <h1>Chat with the Conversation <span role="img" aria-label="emoji">💬</span></h1>
+      <h1>Join the Conversation <span role="img" aria-label="emoji">💬</span></h1>
     </div>
     <div>
       <h2>Try these to interact with Convo</h2>
@@ -27,6 +27,9 @@ const TextContainer = (props) => (
           })
         }
       </ul>
+    </div>
+    <div>
+      <a id="home-button" href="https://theconversation.app/">Home</a>
     </div>
     <div>
       <h2>Ask Convo</h2>

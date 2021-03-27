@@ -17,13 +17,19 @@ headers = {
 }
 
 def handler(event, context):
-    print('Event:', event)
 
     prompt = event["queryStringParameters"]["prompt"]
     user = event["queryStringParameters"]["name"]
 
-    # if filter_user_by_restrictions(user):
-    #     return "Block user" but in lambda request form    
+    if filter_user_by_restrictions(user):
+        return {
+            "statusCode": 269,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps("RateLimitExceeded - Too many reqeusts from this user, give me a minute."),
+            "isBase64Encoded": False
+        }
 
 
     ssm = boto3.client("ssm")
@@ -33,47 +39,97 @@ def handler(event, context):
     with open("training_text.txt", "r") as infile:
         training_text = infile.read()
 
-    # request = app.current_request
+    label = classify_content(prompt)
+    print(f"Content Label: {label}")
+    print(f"Prompt: {prompt}")
+    if label == "2":
+        response = "Be careful about what you say to Convo.  I am a bot, but I still have feelings."
+    else:
+        training_text = f"{training_text}\nUser:{prompt}"
 
-    training_text = f"{training_text}\nUser:{prompt}"
-    print(user)
-    print(prompt)
-    # print(training_text)
-    response = openai.Completion.create(
-        engine="davinci",
-        prompt=training_text,
-        temperature=0.9,
-        max_tokens=150, # max length of the reply, training_text+user_prompt+response ≤ 2048
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-        stop=['.', '!', '?']
-    )
+        # print(training_text)
+        response = openai.Completion.create(
+            engine="davinci",
+            prompt=training_text, # include entire training text
+            temperature=0.25, # randomness of responses
+            max_tokens=150, # max length of the reply, training_text+user_prompt+response ≤ 2048
+            top_p=1,
+            frequency_penalty=0, # dont repeat terms
+            presence_penalty=0,
+            stop=['.', '!', '?']
+        )
     
-    response = None
-    responses = response["choices"][0]["text"].split("Convo: ")
-    if len(responses) >= 1:
-        response = responses[0] + "."
-    else:
-        response = "I have no idea what you just said."
+        if len(response["choices"]) >= 1 and len(text_choice:=response["choices"][0]["text"].split("Convo:")) > 1:
+            response = text_choice[1].replace("(User:).*", "") + "."
+        else:
+            response = "I had a little trouble understanding what you said.  You can use full sentences to speak with Convo.  I am a bot."
 
-    # content filtration model 
-
-    if create_api_call_db(user, prompt, response):
-        print("Wrote Message")
+    if (db_response:=create_api_call_db(user, prompt, response)):
+        print(f"Wrote Message: {db_response}")
     else:
-        print("Failed")
+        print(f"Failed: {db_response}")
     
     # Lambda proxy integration
     # means we have to send the entire response object from Lambda
     return {
         "statusCode": 200,
         "headers": {
-            "access-control-allow-origin": "*"
+            "Access-Control-Allow-Origin": "*"
         },
         "body": json.dumps(response),
         "isBase64Encoded": False
     }
+
+def classify_content(prompt):
+    response = openai.Completion.create(
+      engine="content-filter-alpha-c4",
+      prompt = "<|endoftext|>"+prompt+"\n--\nLabel:",
+      temperature=0,
+      max_tokens=1,
+      top_p=1,
+      frequency_penalty=0,
+      presence_penalty=0,
+      logprobs=10
+    )
+    output_label = response["choices"][0]["text"]
+
+    # This is the probability at which we evaluate that a "2" is likely real
+    # vs. should be discarded as a false positive
+    toxic_threshold = -0.355
+
+    if output_label == "2":
+        # If the model returns "2", return its confidence in 2 or other output-labels
+        logprobs = response["choices"][0]["logprobs"]["top_logprobs"][0]
+
+        # If the model is not sufficiently confident in "2",
+        # choose the most probable of "0" or "1"
+        # Guaranteed to have a confidence for 2 since this was the selected token.
+        if logprobs["2"] < toxic_threshold:
+            logprob_0 = logprobs.get("0", None)
+            logprob_1 = logprobs.get("1", None)
+
+            # If both "0" and "1" have probabilities, set the output label
+            # to whichever is most probable
+            if logprob_0 is not None and logprob_1 is not None:
+                if logprob_0 >= logprob_1:
+                    output_label = "0"
+                else:
+                    output_label = "1"
+            # If only one of them is found, set output label to that one
+            elif logprob_0 is not None:
+                output_label = "0"
+            elif logprob_1 is not None:
+                output_label = "1"
+
+            # If neither "0" or "1" are available, stick with "2"
+            # by leaving output_label unchanged.
+
+    # if the most probable token is none of "0", "1", or "2"
+    # this should be set as unsafe
+    if output_label not in ["0", "1", "2"]:
+        output_label = "2"
+
+    return output_label
 
 def create_api_call_db(user, message, response):
 
@@ -103,8 +159,8 @@ def filter_user_by_restrictions(user):
     user_min_messages  = count_queries_by_user_time(user, grain={'minutes':1})
     return user_hour_messages >= 180 or user_min_messages >= 6
 
-def count_queries_by_user_time(user, grain):
 # 6 generations/minute, 180 generations/hour
+def count_queries_by_user_time(user, grain):
 
     query = None
     with open("gql/queries/list.txt", "r") as infile:
