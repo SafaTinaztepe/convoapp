@@ -45,7 +45,7 @@ def handler(event, context):
     if label == "2":
         response = "Be careful about what you say to Convo.  I am a bot, but I still have feelings."
     else:
-        training_text = f"{training_text}\nUser:{prompt}"
+        training_text = f"{training_text}\nUser: {prompt}\nConvo: "
 
         # print(training_text)
         response = openai.Completion.create(
@@ -58,12 +58,12 @@ def handler(event, context):
             presence_penalty=0,
             stop=['.', '!', '?']
         )
-    
-        if len(response["choices"]) >= 1 and len(text_choice:=response["choices"][0]["text"].split("Convo:")) > 1:
-            response = text_choice[1].replace("(User:).*", "") + "."
+        
+        if len(response["choices"]) >= 1 and len(text_choice:=response["choices"][0]["text"]) > 0:
+            response = text_choice + "."
         else:
             response = "I had a little trouble understanding what you said.  You can use full sentences to speak with Convo.  I am a bot."
-
+        
     if (db_response:=create_api_call_db(user, prompt, response)):
         print(f"Wrote Message: {db_response}")
     else:
