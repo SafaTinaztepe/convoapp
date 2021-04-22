@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import bcryptjs from "bcryptjs";
 import crypto from "crypto";
 
-import TextContainer from '../TextContainer/TextContainer';
+import { TextContainer } from '../TextContainer/TextContainer' ;
 import Messages from '../Messages/Messages';
 import InfoBar from '../InfoBar/InfoBar';
 import Input from '../Input/Input';
+import Chain from '../Chain/Chain';
 
 import { API, graphqlOperation } from 'aws-amplify';
 import { createApiCall } from '../../graphql/mutations';
@@ -19,6 +19,7 @@ const Chat = ({ location }) => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [chatIsDisabled, setChatIsDisabled] = useState(false);
+  const [blockNumber, setBlockNumber] = useState();
 
   useEffect(() => {
     setIpAsName();
@@ -77,15 +78,27 @@ const Chat = ({ location }) => {
   }
 
   return (
-    <div className="outerContainer">
+    <div className="outerContainer">      
       <div className="container">
           <InfoBar />
           <Messages messages={messages} name={name} />
           <Input message={message} setMessage={setMessage} sendMessage={sendMessage} chatIsDisabled={chatIsDisabled} />
       </div>
       <TextContainer setMessage={setMessage} sendMessage={sendMessage} />
+
+      {/* <span>BlockNumber: {blockNumber}</span> */}
     </div>
   );
 }
 
 export default Chat;
+
+
+// etherjs to interact, get information with the blockchain
+// also can write 
+// which layer is selected
+
+// three layer sets, each has a different number for the state they are in, can read the layer combination
+// if certain layer combination happens, it can reveal the hidden layer, displays a new image, hybird layer
+// combinations passed to the backend
+// each number represents a layer

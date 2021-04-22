@@ -56,11 +56,11 @@ def handler(event, context):
             top_p=1,
             frequency_penalty=0, # dont repeat terms
             presence_penalty=0,
-            stop=['.', '!', '?']
+            stop=["User:"]
         )
         
         if len(response["choices"]) >= 1 and len(text_choice:=response["choices"][0]["text"]) > 0:
-            response = text_choice + "."
+            response = text_choice
         else:
             response = "I had a little trouble understanding what you said.  You can use full sentences to speak with Convo.  I am a bot."
         
