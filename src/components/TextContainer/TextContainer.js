@@ -22,13 +22,12 @@ let presets = [
 
 
 const TextContainer = (props) => {
-
   return (
     <div className="textContainer">
       <Tabs>
         <TabList>
-          <Tab>Chat With Convo</Tab>
-          <Tab>Query The Blockchain</Tab>
+          <Tab onClick={() => {props.handleSetBlockchainOption(null)}}>Chat With Convo</Tab>
+          <Tab onClick={() => {!props.blockchainOption ? props.handleSetBlockchainOption("value") : props.blockchainOption}}>Query The Blockchain</Tab>
         </TabList>
       
       <TabPanel>
@@ -53,7 +52,7 @@ const TextContainer = (props) => {
         <div style={{width:"500px"}}>
           <h2>Ask Convo</h2>
           <ul>
-            <Chain />
+            <Chain setContract={props.setContract} />
           </ul>
         </div>
       </TabPanel>

@@ -18,8 +18,17 @@ headers = {
 
 def handler(event, context):
 
-    prompt = event["queryStringParameters"]["prompt"]
-    user = event["queryStringParameters"]["name"]
+    params = event["queryStringParameters"]
+
+    prompt = params["prompt"]
+    user = params["name"]
+
+    if "token" in params:
+        token = params["token"]
+    if "owner" in params:
+        owner = params["owner"]
+    if "value" in params:
+        value = params["value"]
 
     if filter_user_by_restrictions(user):
         return {
@@ -30,7 +39,6 @@ def handler(event, context):
             "body": json.dumps("RateLimitExceeded - Too many reqeusts from this user, give me a minute."),
             "isBase64Encoded": False
         }
-
 
     ssm = boto3.client("ssm")
     api_key = ssm.get_parameter(Name="openai_api_key", WithDecryption=True)['Parameter']['Value']
@@ -47,16 +55,23 @@ def handler(event, context):
     else:
         training_text = f"{training_text}\nUser: {prompt}\nConvo: "
 
+        if token:
+            training_text = training_text.replace(r"{token}", token)
+        if owner:
+            training_text = training_text.replace(r"{owner}", owner)
+        if value:
+            training_text = training_text.replace(r"{value}", value)
+
         # print(training_text)
         response = openai.Completion.create(
             engine="davinci",
             prompt=training_text, # include entire training text
-            temperature=0.25, # randomness of responses
+            temperature=0, # randomness of responses
             max_tokens=150, # max length of the reply, training_text+user_prompt+response ≤ 2048
             top_p=1,
             frequency_penalty=0, # dont repeat terms
             presence_penalty=0,
-            stop=["User:"]
+            stop=["User: "]
         )
         
         if len(response["choices"]) >= 1 and len(text_choice:=response["choices"][0]["text"]) > 0:

@@ -15,7 +15,7 @@
       "function": {
         "convolambda": {
           "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
-          "s3Key": "amplify-builds/convolambda-6a6450397a5436686335-build.zip"
+          "s3Key": "amplify-builds/convolambda-693962414b7969795578-build.zip"
         }
       }
     }

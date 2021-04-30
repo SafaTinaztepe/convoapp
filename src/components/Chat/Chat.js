@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { formatEther } from '@ethersproject/units'
 import axios from "axios";
 import crypto from "crypto";
 
@@ -10,6 +11,7 @@ import Chain from '../Chain/Chain';
 
 import { API, graphqlOperation } from 'aws-amplify';
 import { createApiCall } from '../../graphql/mutations';
+import { BigNumber } from '@ethersproject/bignumber';
 
 import './Chat.css';
 
@@ -18,12 +20,25 @@ const Chat = ({ location }) => {
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
-  const [chatIsDisabled, setChatIsDisabled] = useState(false);
   const [blockNumber, setBlockNumber] = useState();
+  const [chatIsDisabled, setChatIsDisabled] = useState(false);
+
+  const [blockchainOption, setBlockchainOption] = useState();
+  const [isBlockchainRequest, setIsBlockchainRequest] = useState(false);
+
+  const [contract, setContract] = useState();
+  const [tokenOwner, setTokenOwner] = useState();
+  const [tokenValue, setTokenValue] = useState();
+
 
   useEffect(() => {
     setIpAsName();
   });
+
+  const handleSetBlockchainOption = (option) => {
+    setBlockchainOption(option);
+    console.log(option, blockchainOption);
+  }
 
   const setIpAsName = () => {
     axios.get('https://api.ipify.org?format=json')
@@ -36,6 +51,39 @@ const Chat = ({ location }) => {
           });
   }
 
+  const ownerOfToken = async (token) => {
+    if (contract) {
+      // contract.ownerOf(BigNumber.from(732)).then((data) => {console.log(data)}).catch((err) => {console.log(err)})
+      contract.ownerOf(BigNumber.from(token))
+        .then((data) => {
+          setTokenOwner(data)
+          let message = `The owner of the token is ${data}`
+          setMessages(messages => [ ...messages, {text:message, user:'convo'} ])
+        })
+        .catch((err) => {
+          let message = `I could not find data on that token`
+          setMessages(messages => [ ...messages, {text:message, user:'convo'} ])
+        })
+        // console.log(owner)
+    } else {
+      let message = `Connect to the Ethereum network first by going to the Blockchain tab`
+      setMessages(messages => [ ...messages, {text:message, user:'convo'} ])
+    }
+  }
+
+  const valueOfToken = async (token) => {
+    if (contract) {
+      // contract.ownerOf(BigNumber.from(732)).then((data) => {console.log(data)}).catch((err) => {console.log(err)})
+      contract.getControlToken(BigNumber.from(token))
+      .then((data) => {
+        console.log(data)
+        const str = data.reduce((acc,e) => {return acc + "\n" + formatEther(e)}, "" )  // array to string
+        setTokenValue(str)
+        setMessages(messages => [ ...messages, {text:str, user:'convo'} ])
+      }).catch((err) => {console.log(err)})
+      // console.log(owner)
+    }
+  }
 
   const sanitizeString = (str) => {
     str = str.replace(/[^A-Za-z0-9áéíóúñü\?\! \.,_-]/gim, "").replace("User: ", "").replace("Convo: ", "");
@@ -44,8 +92,24 @@ const Chat = ({ location }) => {
 
   const sendMessage = (event) => {
     event.preventDefault();
-    
-    if(message && !chatIsDisabled) {
+    console.log(contract);
+    if(blockchainOption){
+      console.log(blockchainOption);
+      if(blockchainOption === "owner"){
+        ownerOfToken(message)
+        setMessages(messages => [ ...messages, {text:`Who is the owner of token ${message}?`, user:name} ])
+        setMessage("");
+        //   .then(() => {setMessages(messages => [ ...messages, {text:tokenOwner, user:'convo'} ])})
+        
+      }
+      if(blockchainOption === "value"){
+        valueOfToken(message)
+        setMessages(messages => [ ...messages, {text:`What is the value of token ${message}?`, user:name} ])
+        // setMessages(messages => [ ...messages, {text:tokenValue, user:'convo'} ])
+        setMessage("");
+      }
+
+    } else if(message && !chatIsDisabled) {
       
       var payload, err;
       prompt = sanitizeString(message);
@@ -82,9 +146,23 @@ const Chat = ({ location }) => {
       <div className="container">
           <InfoBar />
           <Messages messages={messages} name={name} />
-          <Input message={message} setMessage={setMessage} sendMessage={sendMessage} chatIsDisabled={chatIsDisabled} />
+          <Input 
+            message={message}
+            setMessage={setMessage} 
+            sendMessage={sendMessage} 
+            chatIsDisabled={chatIsDisabled} 
+            isBlockchainRequest={isBlockchainRequest} 
+            blockchainOption={blockchainOption}
+            handleSetBlockchainOption={handleSetBlockchainOption} 
+          />
       </div>
-      <TextContainer setMessage={setMessage} sendMessage={sendMessage} />
+      <TextContainer 
+        setMessage={setMessage}
+        sendMessage={sendMessage}
+        blockchainOption={blockchainOption}
+        handleSetBlockchainOption={handleSetBlockchainOption}
+        setContract={setContract}
+      />
 
       {/* <span>BlockNumber: {blockNumber}</span> */}
     </div>

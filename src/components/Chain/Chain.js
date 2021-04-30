@@ -28,7 +28,7 @@ const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 5, 42] })
 const Chain = (props) => {
     return (
         <Web3ReactProvider getLibrary={getLibrary}>
-            <_Chain props={props}/>
+            <_Chain setContract={props.setContract}/>
         </Web3ReactProvider>
     )
 }
@@ -52,11 +52,9 @@ const _Chain = (props) => {
     const updateBlockNumber = (blockNumber) =>  {
       setBlockNumber(blockNumber);
     };
-
     const updateEthBalance = (balance) =>  {
       setEthBalance(balance);
     };
-
     const getBlockNumber = () => {
       if (library){
         let stale = false;
@@ -77,7 +75,6 @@ const _Chain = (props) => {
         return blockNumber;
       }
     }
-
     const getEthBalance = () => {
       if (library && account) {
         let stale = false;
@@ -102,7 +99,6 @@ const _Chain = (props) => {
         };
       }
     }
-
     const activateConnector = () => {
       activate(injected)
       console.log(active)
@@ -118,22 +114,29 @@ const _Chain = (props) => {
         var asyncAddress = "0x4F37310372dd39d451f7022EE587FA8B9F72d80B" // contract address
         const _contract = new Contract(asyncAddress, AsyncAbi, signer)
         setContract(_contract)
+        props.setContract(_contract)
       }
     }
 
-    const ownerOfToken = async () => {
+    const ownerOfToken = async (token) => {
       if (contract) {
         // contract.ownerOf(BigNumber.from(732)).then((data) => {console.log(data)}).catch((err) => {console.log(err)})
-        contract.ownerOf(768).then((data) => {console.log(data)}).catch((err) => {console.log(err)})
+        contract.ownerOf(BigNumber.from(token)).then((data) => {console.log(data)}).catch((err) => {console.log(err)})
+        // console.log(owner)
+      }
+    }
+
+    const valueOfToken = async (token) => {
+      if (contract) {
+        // contract.ownerOf(BigNumber.from(732)).then((data) => {console.log(data)}).catch((err) => {console.log(err)})
+        contract.getControlToken(BigNumber.from(token)).then((data) => {console.log(data)}).catch((err) => {console.log(err)})
         // console.log(owner)
       }
     }
 
     useEffect(() => {
-      console.log(context)
       if(!contract){
         getContract()
-        console.log("contract", contract)
       }
     })
 
