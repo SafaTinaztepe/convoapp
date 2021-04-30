@@ -22,13 +22,8 @@ def handler(event, context):
 
     prompt = params["prompt"]
     user = params["name"]
+    chain_info = {p:params[p] for p in ["token", "owner", "value"]}
 
-    if "token" in params:
-        token = params["token"]
-    if "owner" in params:
-        owner = params["owner"]
-    if "value" in params:
-        value = params["value"]
 
     if filter_user_by_restrictions(user):
         return {
@@ -55,12 +50,8 @@ def handler(event, context):
     else:
         training_text = f"{training_text}\nUser: {prompt}\nConvo: "
 
-        if token:
-            training_text = training_text.replace(r"{token}", token)
-        if owner:
-            training_text = training_text.replace(r"{owner}", owner)
-        if value:
-            training_text = training_text.replace(r"{value}", value)
+        for k, v in chain_info.items():
+            training_text.replace(f"{k}", v)
 
         # print(training_text)
         response = openai.Completion.create(
