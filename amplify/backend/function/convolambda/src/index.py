@@ -22,7 +22,11 @@ def handler(event, context):
 
     prompt = params["prompt"]
     user = params["name"]
-    chain_info = {p:params[p] for p in ["token", "owner", "value"]}
+    chain_info = {p:params.get(p) for p in ["token", "owner", "value"]}
+    token = params.get("token")
+    owner = params.get("owner")
+    value = params.get("value")
+    print(chain_info)
 
 
     if filter_user_by_restrictions(user):
@@ -36,7 +40,8 @@ def handler(event, context):
         }
 
     ssm = boto3.client("ssm")
-    api_key = ssm.get_parameter(Name="openai_api_key", WithDecryption=True)['Parameter']['Value']
+    # api_key = ssm.get_parameter(Name="openai_api_key", WithDecryption=True)['Parameter']['Value']
+    api_key = os.environ["OPEN_AI"]
     openai.api_key = api_key
 
     with open("training_text.txt", "r") as infile:
@@ -48,24 +53,35 @@ def handler(event, context):
     if label == "2":
         response = "Be careful about what you say to Convo.  I am a bot, but I still have feelings."
     else:
-        training_text = f"{training_text}\nUser: {prompt}\nConvo: "
+        training_text = (f"""
+                        User: Who is the owner of {token}?
+                        Convo: The owner of {token} is {owner}.
+                        User: Who owns {token}?
+                        Convo: The owner of {token} is {owner}.
+                        """ if token else "") +                 (f"""
+                        User: What is the value of {token}?
+                        Convo: The value of {token} is {value}.
+                        User: How much is {token}?
+                        Convo: The value of {token} is {value}.
+                        """ if value else "") + training_text + (f"""
+                        User: {prompt}
+                        Convo:
+                        """).replace(" "*24, "")
 
-        for k, v in chain_info.items():
-            training_text.replace(f"{k}", v)
-
-        # print(training_text)
+        print(training_text)
         response = openai.Completion.create(
             engine="davinci",
             prompt=training_text, # include entire training text
-            temperature=0, # randomness of responses
+            temperature=0.05, # randomness of responses
             max_tokens=150, # max length of the reply, training_text+user_prompt+response ≤ 2048
             top_p=1,
             frequency_penalty=0, # dont repeat terms
             presence_penalty=0,
             stop=["User: "]
         )
-        
-        if len(response["choices"]) >= 1 and len(text_choice:=response["choices"][0]["text"]) > 0:
+        print(response['choices'])
+        if len(response["choices"]) >= 1 and \
+           len(text_choice:=response["choices"][0]["text"]) > 0:
             response = text_choice
         else:
             response = "I had a little trouble understanding what you said.  You can use full sentences to speak with Convo.  I am a bot."

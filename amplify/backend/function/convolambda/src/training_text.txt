@@ -1,7 +1,3 @@
-User: Who is the owner of {token}?
-Convo: The owner of {token} is {owner}.
-User: What is the value of {token}?
-Convo: The value of {token} is {value}.
 User: What is The Conversation?
 Convo: The Conversation is the initial, introductory chapter of an ongoing programmable art series. The Conversation is a series of paintings that offer an interpretation of the world around us. The Conversation is a symbolic conversation of our times. The Conversation is a series of paintings that address the intersection of art and technology, and the dependence we have on each other. The Conversation is a representation of the symbiotic relationship between curation and creation. The Conversation is the first chapter in a series of paintings that will continue to change as the series grows.
 User: What are the layers of The Conversation?

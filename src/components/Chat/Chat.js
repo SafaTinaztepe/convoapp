@@ -52,16 +52,17 @@ const Chat = ({ location }) => {
   }
 
   const ownerOfToken = async (token) => {
+    console.log(token)
     if (contract) {
       // contract.ownerOf(BigNumber.from(732)).then((data) => {console.log(data)}).catch((err) => {console.log(err)})
       contract.ownerOf(BigNumber.from(token))
         .then((data) => {
           setTokenOwner(data)
-          let message = `The owner of the token is ${data}`
-          setMessages(messages => [ ...messages, {text:message, user:'convo'} ])
+          let message = `The owner of the ${token} is ${data}`
+          // setMessages(messages => [ ...messages, {text:message, user:'convo'} ])
         })
         .catch((err) => {
-          let message = `I could not find data on that token`
+          let message = `I could not find data on token ${token}`
           setMessages(messages => [ ...messages, {text:message, user:'convo'} ])
         })
         // console.log(owner)
@@ -82,6 +83,9 @@ const Chat = ({ location }) => {
         setMessages(messages => [ ...messages, {text:str, user:'convo'} ])
       }).catch((err) => {console.log(err)})
       // console.log(owner)
+    } else {
+      let message = `Connect to the Ethereum network first by going to the Blockchain tab`
+      setMessages(messages => [ ...messages, {text:message, user:'convo'} ])
     }
   }
 
@@ -93,12 +97,26 @@ const Chat = ({ location }) => {
   const sendMessage = (event) => {
     event.preventDefault();
     console.log(contract);
-    if(blockchainOption){
+    var payload;
+    if( message.includes("owns") || message.includes("owner of") ||  blockchainOption){
       console.log(blockchainOption);
-      if(blockchainOption === "owner"){
-        ownerOfToken(message)
-        setMessages(messages => [ ...messages, {text:`Who is the owner of token ${message}?`, user:name} ])
+      // if(blockchainOption === "owner"){
+      let token = message.match(/\d+/g)
+      console.log(message, token)
+      let prompt = sanitizeString(message)
+      if(token || blockchainOption === "owner"){
+        ownerOfToken(parseInt(token))
+        setMessages(messages => [ ...messages, {text:prompt, user:name} ])
         setMessage("");
+        API.get("convorestapi", '/convo', {'queryStringParameters': {'prompt': prompt, 'name':name, 'token':token, 'owner':tokenOwner}})
+        .then((response) => {
+          payload = response
+        })
+        .catch((err) => {payload = err.text})
+        .then(() => {
+          setMessages(messages => [ ...messages, {text:payload, user:'convo'} ])
+        })
+
         //   .then(() => {setMessages(messages => [ ...messages, {text:tokenOwner, user:'convo'} ])})
         
       }
