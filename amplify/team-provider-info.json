@@ -19,5 +19,26 @@
         }
       }
     }
+  },
+  "stable": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-convoapp-stable-225000-authRole",
+      "UnauthRoleArn": "arn:aws:iam::993124166330:role/amplify-convoapp-stable-225000-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::993124166330:role/amplify-convoapp-stable-225000-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-convoapp-stable-225000-deployment",
+      "UnauthRoleName": "amplify-convoapp-stable-225000-unauthRole",
+      "StackName": "amplify-convoapp-stable-225000",
+      "StackId": "arn:aws:cloudformation:us-east-1:993124166330:stack/amplify-convoapp-stable-225000/e80e2b00-b84c-11eb-9701-12f0216d258f",
+      "AmplifyAppId": "d1gzkkdez8wqpd"
+    },
+    "categories": {
+      "function": {
+        "convolambda": {
+          "deploymentBucketName": "amplify-convoapp-stable-225000-deployment",
+          "s3Key": "amplify-builds/convolambda-4d4f7768524a4f313547-build.zip"
+        }
+      }
+    }
   }
 }

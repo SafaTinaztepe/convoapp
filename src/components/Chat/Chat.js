@@ -94,8 +94,7 @@ const Chat = ({ location }) => {
     return str.trim();
   }
 
-  const sendMessage = (event) => {
-    event.preventDefault();
+  const sendMessage = (message) => {
     console.log(contract);
     var payload;
     if( message.includes("owns") || message.includes("owner of") ||  blockchainOption){
