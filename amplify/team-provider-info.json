@@ -15,7 +15,11 @@
       "function": {
         "convolambda": {
           "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
-          "s3Key": "amplify-builds/convolambda-482f747571456c384a72-build.zip"
+          "s3Key": "amplify-builds/convolambda-4151556d394a4a4d5876-build.zip"
+        },
+        "convodata": {
+          "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
+          "s3Key": "amplify-builds/convodata-66693971316371365762-build.zip"
         }
       }
     }
@@ -36,7 +40,11 @@
       "function": {
         "convolambda": {
           "deploymentBucketName": "amplify-convoapp-stable-225000-deployment",
-          "s3Key": "amplify-builds/convolambda-4d4f7768524a4f313547-build.zip"
+          "s3Key": "amplify-builds/convolambda-4a704341393632627531-build.zip"
+        },
+        "convodata": {
+          "deploymentBucketName": "amplify-convoapp-stable-225000-deployment",
+          "s3Key": "amplify-builds/convodata-463138624977354b7a56-build.zip"
         }
       }
     }

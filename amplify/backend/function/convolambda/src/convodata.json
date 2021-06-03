@@ -1,0 +1,50 @@
+{
+    "master": {
+        "lastSale": {
+            "timestamp": "1593379890"
+        },
+        "layers": [
+            {
+                "levers": [
+                    {
+                        "currentValue": 0
+                    }
+                ],
+                "owner": {
+                    "id": "0xf2a841f4025159e5a845de3172384a7bca00ddde"
+                }
+            },
+            {
+                "levers": [
+                    {
+                        "currentValue": 0
+                    }
+                ],
+                "owner": {
+                    "id": "0xf2a841f4025159e5a845de3172384a7bca00ddde"
+                }
+            },
+            {
+                "levers": [
+                    {
+                        "currentValue": 15
+                    }
+                ],
+                "owner": {
+                    "id": "0xf2a841f4025159e5a845de3172384a7bca00ddde"
+                }
+            },
+            {
+                "levers": [
+                    {
+                        "currentValue": 2
+                    }
+                ],
+                "owner": {
+                    "id": "0xf2a841f4025159e5a845de3172384a7bca00ddde"
+                }
+            }
+        ],
+        "owner": {}
+    }
+}
