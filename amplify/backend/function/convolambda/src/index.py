@@ -8,6 +8,7 @@ import requests
 import datetime as dt
 import openai
 import json
+from string import Template
 
 headers = {
     "host"     : os.environ["API_CONVOAPP_GRAPHQLAPIENDPOINTOUTPUT"].replace("https://", "").replace("/graphql", ""),
@@ -19,10 +20,13 @@ headers = {
 def handler(event, context):
 
     params = event["queryStringParameters"]
-
+    ssm = boto3.client("ssm")    
     prompt = params["prompt"]
     user = params["name"]
-    chain_info = {p:params[p] for p in ["token", "owner", "value"]}
+
+    layer_data = ssm.get_parameter(Name="convo_layer_data")["Parameter"]["Value"]
+    layer_data = json.loads(layer_data)["data"]["master"]
+    print(layer_data)
 
 
     if filter_user_by_restrictions(user):
@@ -35,12 +39,19 @@ def handler(event, context):
             "isBase64Encoded": False
         }
 
-    ssm = boto3.client("ssm")
-    api_key = ssm.get_parameter(Name="openai_api_key", WithDecryption=True)['Parameter']['Value']
+    api_key = os.environ["OPEN_AI"]
     openai.api_key = api_key
 
     with open("training_text.txt", "r") as infile:
+        # training_text = Template(infile.read())
         training_text = infile.read()
+
+    for i, layer in enumerate(layer_data["layers"]):
+        value = layer["levers"][0]['currentValue']
+        owner = layer["owner"]["id"]
+        value_string = f"\nUser: What is the value of {i}?\nConvo: The value of {i} is {value}."
+        owner_string = f"\nUser: Who is the owner of {i}?\nConvo: The owner of {i} is {owner}."
+        training_text += value_string + owner_string
 
     label = classify_content(prompt)
     print(f"Content Label: {label}")
@@ -48,24 +59,22 @@ def handler(event, context):
     if label == "2":
         response = "Be careful about what you say to Convo.  I am a bot, but I still have feelings."
     else:
-        training_text = f"{training_text}\nUser: {prompt}\nConvo: "
+        training_text += (f"\nUser: {prompt}\nConvo: ")
 
-        for k, v in chain_info.items():
-            training_text.replace(f"{k}", v)
-
-        # print(training_text)
+        print(training_text)
         response = openai.Completion.create(
             engine="davinci",
             prompt=training_text, # include entire training text
-            temperature=0, # randomness of responses
+            temperature=0.1, # randomness of responses
             max_tokens=150, # max length of the reply, training_text+user_prompt+response ≤ 2048
             top_p=1,
             frequency_penalty=0, # dont repeat terms
             presence_penalty=0,
             stop=["User: "]
         )
-        
-        if len(response["choices"]) >= 1 and len(text_choice:=response["choices"][0]["text"]) > 0:
+        print(response['choices'])
+        if len(response["choices"]) >= 1 and \
+           len(text_choice:=response["choices"][0]["text"]) > 0:
             response = text_choice
         else:
             response = "I had a little trouble understanding what you said.  You can use full sentences to speak with Convo.  I am a bot."

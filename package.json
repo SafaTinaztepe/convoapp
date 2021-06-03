@@ -16,6 +16,7 @@
     "bcryptjs": "^2.4.3",
     "crypto": "^1.0.1",
     "ethers": "^5.1.0",
+    "got": "^9.6.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-emoji": "^0.5.0",
@@ -29,7 +30,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "push": "source activate_environment && amplify push --yes",
+    "publish": "amplify publish"
   },
   "browserslist": {
     "production": [

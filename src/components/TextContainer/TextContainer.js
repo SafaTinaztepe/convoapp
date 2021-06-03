@@ -7,10 +7,9 @@ import Chain from '../Chain/Chain'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
-const sendPresetMessage = (event, setMessage, sendMessage) => {
-  const text = event.target.innerText 
-  setMessage(text);
-  sendMessage(event, text);
+const sendPresetMessage = (message, setMessage, sendMessage) => {
+  setMessage(message);
+  sendMessage(event, message);
 }
 
 let presets = [
@@ -22,6 +21,7 @@ let presets = [
 
 
 const TextContainer = (props) => {
+  const generic_button = (message, i, textOverride) => (<li key={i}><button onClick={(event) => sendPresetMessage(message, props.setMessage, props.sendMessage)} className="messageBox backgroundOrange"><span className="messageText">{textOverride || message}</span></button></li>)
   return (
     <div className="textContainer">
       <Tabs>
@@ -38,10 +38,9 @@ const TextContainer = (props) => {
           <h2>Try these to interact with Convo</h2>
           <ul>
             {
-              presets.map((preset,i) => {
-                return(<li key={i}><button onClick={(event) => sendPresetMessage(event, props.setMessage, props.sendMessage)} className="messageBox backgroundOrange"><span className="messageText">{preset}</span></button></li>)
-              })
+              presets.map(generic_button)
             }
+            <li>{generic_button(presets[Math.round(Math.random() * (presets.length-1))], presets.length+1, "Ask a random question")}</li>
           </ul>
         </div>
         <div>
