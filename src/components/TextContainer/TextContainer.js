@@ -64,6 +64,10 @@ const TextContainer = ({setMessage, sendMessage, chatIsDisabled, name}) => {
     <div className="textContainer">
       <div style={{width:"50 0px"}}>
         <h1>Join the Conversation</h1>
+        <ul>
+          <li>Ask who is the owner of 0-5</li>
+          <li>Ask what is the value of 0-5</li>
+        </ul>
       </div>
       <div>
         <h2>Try these to interact with Convo <span role="img" aria-label="emoji" onClick={() => setPresetList()}>🔄</span></h2>
