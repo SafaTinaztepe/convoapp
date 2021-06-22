@@ -73,17 +73,18 @@ const Chat = ({ }) => {
   }
 
   // TODO: have a "..." message block appear while waiting for backend request
-  const sendMessage = (message) => {
+  // TODO: sendPresetMessage user is still broken
+  const sendMessage = (message, user) => {
     if(message && !chatIsDisabled) {
-      
       var payload;
+      let u = user | name;
       let prompt = sanitizeString(message);
-      console.log("NAME: " + name)
-      setMessages(messages => [ ...messages, {text:message, user:name} ]);
+      console.log("NAME: " + user)
+      setMessages(messages => [ ...messages, {text:message, user:u} ]);
       setMessage("");
       setChatIsDisabled(true);
 
-      API.get("convorestapi", '/convo', {'queryStringParameters': {'prompt': prompt, 'name':name}})
+      API.get("convorestapi", '/convo', {'queryStringParameters': {'prompt': prompt, 'name':u}})
         .then((response) => {
           // handle success
           payload = (
@@ -122,6 +123,7 @@ const Chat = ({ }) => {
         setMessage={setMessage}
         sendMessage={sendMessage}
         chatIsDisabled={chatIsDisabled}
+        name={name}
       />
 
     </div>

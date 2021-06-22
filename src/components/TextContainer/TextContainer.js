@@ -10,18 +10,14 @@ import { questions } from "./questions.js";
 //   sendMessage(message);
 // }
 
-const TextContainer = ({setMessage, sendMessage, chatIsDisabled}) => {
+const TextContainer = ({setMessage, sendMessage, chatIsDisabled, name}) => {
   const [presetList, setPresetList] = useState();
-
-  const sendMessage2 = (message) => {
-    sendMessage(message)
-  }
 
   const generic_button = (message, i) => {
     return (
       <li key={i}>
         <button 
-          onClick={(event) => sendMessage2(message)}
+          onClick={(event) => sendMessage(message, name)}
           className="messageBox backgroundOrange"
           disabled={chatIsDisabled}
         >
