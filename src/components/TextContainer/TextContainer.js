@@ -1,65 +1,85 @@
 import React, { useState, useEffect } from "react";
-import onlineIcon from '../../icons/onlineIcon.png';
 import '../Messages/Message/Message.css';
 import './TextContainer.css';
-import Chain from '../Chain/Chain'
-
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
+import { questions } from "./questions.js";
 
-const sendPresetMessage = (message, setMessage, sendMessage) => {
-  setMessage(message);
-  sendMessage(event, message);
-}
+// const sendPresetMessage = (message, setMessage, sendMessage) => {
+//   console.log(message)
+//   setMessage(message);
+//   sendMessage(message);
+// }
 
-let presets = [
-  "How much does a layer cost?", 
-  "How much does the master cost?", 
-  "What state is the Room in?", 
-  "Which way is the Muse facing?"
-]
+const TextContainer = ({setMessage, sendMessage, chatIsDisabled}) => {
+  const [presetList, setPresetList] = useState();
 
+  const sendMessage2 = (message) => {
+    sendMessage(message)
+  }
 
-const TextContainer = (props) => {
-  const generic_button = (message, i, textOverride) => (<li key={i}><button onClick={(event) => sendPresetMessage(message, props.setMessage, props.sendMessage)} className="messageBox backgroundOrange"><span className="messageText">{textOverride || message}</span></button></li>)
+  const generic_button = (message, i) => {
+    return (
+      <li key={i}>
+        <button 
+          onClick={(event) => sendMessage2(message)}
+          className="messageBox backgroundOrange"
+          disabled={chatIsDisabled}
+        >
+          <span className="messageText">
+            {message}
+          </span>
+        </button>
+      </li>
+    )
+  }
+
+  const generatePresetList = (preset_arr) => {
+    let presetsButtons = preset_arr.map((preset, index) => {
+      return generic_button(preset, index)
+    });
+    setPresetList(presetsButtons)
+  }
+
+  const head = (arr, n) => {
+    return arr.slice(0, n)
+  }
+
+  const shuffle = (arr) => {
+    return arr.sort(() => (Math.random() > .5) ? 1 : -1)
+  }
+  
+  const dedup = (arr) => {
+    return [... new Set(arr)]
+  }
+
+  useEffect(() => {
+    if(!presetList){
+      generatePresetList(
+        head(
+          dedup(
+            shuffle(questions),
+          ),
+        5)
+      )
+    }
+  })
+
   return (
     <div className="textContainer">
-      <Tabs>
-        <TabList>
-          <Tab onClick={() => {props.handleSetBlockchainOption(null)}}>Chat With Convo</Tab>
-          <Tab onClick={() => {!props.blockchainOption ? props.handleSetBlockchainOption("value") : props.blockchainOption}}>Query The Blockchain</Tab>
-        </TabList>
-      
-      <TabPanel>
-        <div style={{width:"500px"}}>
-          <h1>Join the Conversation <span role="img" aria-label="emoji">💬</span></h1>
-        </div>
-        <div>
-          <h2>Try these to interact with Convo</h2>
-          <ul>
-            {
-              presets.map(generic_button)
-            }
-            <li>{generic_button(presets[Math.round(Math.random() * (presets.length-1))], presets.length+1, "Ask a random question")}</li>
-          </ul>
-        </div>
-        <div>
-          <a id="home-button" href="https://theconversation.app/">Home</a>
-        </div>
-      </TabPanel>
-      <TabPanel>
-        <div style={{width:"500px"}}>
-          <h2>Ask Convo</h2>
-          <ul>
-            <Chain setContract={props.setContract} />
-          </ul>
-        </div>
-      </TabPanel>
-      </Tabs>
+      <div style={{width:"50 0px"}}>
+        <h1>Join the Conversation</h1>
+      </div>
+      <div>
+        <h2>Try these to interact with Convo <span role="img" aria-label="emoji" onClick={() => setPresetList()}>🔄</span></h2>
+        <ul>
+          {presetList ? presetList : null}
+        </ul>
+      </div>
+      <div>
+        <a id="home-button" href="https://theconversation.app/">Home</a>
+      </div>
     </div>
     )
   };
 
-export { TextContainer };
-
-// https://consensys.net/blog/developers/how-to-fetch-and-update-data-from-ethereum-with-react-and-swr/
+export default TextContainer;

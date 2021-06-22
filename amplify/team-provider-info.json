@@ -15,11 +15,15 @@
       "function": {
         "convolambda": {
           "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
-          "s3Key": "amplify-builds/convolambda-4151556d394a4a4d5876-build.zip"
+          "s3Key": "amplify-builds/convolambda-61625538655147686754-build.zip"
         },
         "convodata": {
           "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
           "s3Key": "amplify-builds/convodata-66693971316371365762-build.zip"
+        },
+        "convouniques": {
+          "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
+          "s3Key": "amplify-builds/convouniques-47636e31327735784b47-build.zip"
         }
       }
     }
