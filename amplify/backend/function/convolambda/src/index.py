@@ -8,7 +8,6 @@ import requests
 import datetime as dt
 import openai
 import json
-from string import Template
 
 headers = {
     "host"     : os.environ["API_CONVOAPP_GRAPHQLAPIENDPOINTOUTPUT"].replace("https://", "").replace("/graphql", ""),
@@ -31,11 +30,11 @@ def handler(event, context):
 
     if filter_user_by_restrictions(user):
         return {
-            "statusCode": 269,
+            "statusCode": 429,
             "headers": {
                 "Access-Control-Allow-Origin": "*"
             },
-            "body": json.dumps("RateLimitExceeded - Too many reqeusts from this user, give me a minute."),
+            "body": "RateLimitExceeded - Too many reqeusts from this user, give me a minute.",
             "isBase64Encoded": False
         }
 
@@ -61,7 +60,7 @@ def handler(event, context):
     else:
         training_text += (f"\nUser: {prompt}\nConvo: ")
 
-        print(training_text)
+        # print(training_text)
         response = openai.Completion.create(
             engine="davinci",
             prompt=training_text, # include entire training text
@@ -72,17 +71,14 @@ def handler(event, context):
             presence_penalty=0,
             stop=["User: "]
         )
-        print(response['choices'])
+        # print(response['choices'])
         if len(response["choices"]) >= 1 and \
            len(text_choice:=response["choices"][0]["text"]) > 0:
             response = text_choice
         else:
             response = "I had a little trouble understanding what you said.  You can use full sentences to speak with Convo.  I am a bot."
         
-    if (db_response:=create_api_call_db(user, prompt, response)):
-        print(f"Wrote Message: {db_response}")
-    else:
-        print(f"Failed: {db_response}")
+    create_api_call_db(user, prompt, response)
     
     # Lambda proxy integration
     # means we have to send the entire response object from Lambda
@@ -148,7 +144,6 @@ def classify_content(prompt):
 
 def create_api_call_db(user, message, response):
 
-    mutation = None
     with open("gql/mutations/create.txt", "r") as infile:
         mutation = infile.read()
 
@@ -158,21 +153,22 @@ def create_api_call_db(user, message, response):
         'response': response
     }
 
-    response = None
     request = requests.post(os.environ['API_CONVOAPP_GRAPHQLAPIENDPOINTOUTPUT'], json={'query': mutation, 'variables':{'input':ApiCall}}, headers=headers)
     if request.status_code == 200:
-        response = request.json()
+        # return request.json()
+        print("DB: wrote query")
     else:
-        print(request.text)
-        print(request)
-        raise Exception("Query failed to run by returning code of {}. {}".format(request.status_code, mutation))
+        print("DB: failed write")
 
-    return response
 
 def filter_user_by_restrictions(user):
-    user_hour_messages = count_queries_by_user_time(user, grain={'hours':1})
     user_min_messages  = count_queries_by_user_time(user, grain={'minutes':1})
-    return user_hour_messages >= 180 or user_min_messages >= 6
+    return user_min_messages >= 6
+
+# def filter_user_by_restrictions(user):
+#     user_hour_messages = count_queries_by_user_time(user, grain={'hours':1})
+#     user_min_messages  = count_queries_by_user_time(user, grain={'minutes':1})
+#     return user_hour_messages >= 180 or user_min_messages >= 6
 
 # 6 generations/minute, 180 generations/hour
 def count_queries_by_user_time(user, grain):
@@ -189,11 +185,10 @@ def count_queries_by_user_time(user, grain):
             "between":[
                 (dt.datetime.now()-dt.timedelta(**grain)).isoformat(), # yesterday
                 dt.datetime.now().isoformat()
-            ]   
+            ]
         }
     }
 
-    response = None
     request = requests.post(os.environ['API_CONVOAPP_GRAPHQLAPIENDPOINTOUTPUT'], json={'query': query, 'variables':{'filter':filters}}, headers=headers)
     if request.status_code == 200:
         response = request.json()
@@ -201,5 +196,10 @@ def count_queries_by_user_time(user, grain):
         raise Exception("Query failed to run by returning code of {}. {}".format(request.status_code, query))
 
     n_items = response['data']['listApiCalls']['items']
+    print(f"previous calls: {n_items}")
 
     return len(n_items)
+
+# container to manually override bot responses
+def fork_response():
+    pass

@@ -1,0 +1,23 @@
+export let questions = [
+    "What is The Conversation?",
+    "What are the layers of The Conversation?",
+    "What are the Room Layers of The Conversation?",
+    "What are the Painting Layers of The Conversation?",
+    "What are the Muse Layers of The Conversation?",
+    "Is there a secret layer of The Conversation?",
+    "Is there a hidden layer of The Conversation?",
+    "What state is The Muse in?",
+    "What state is The Painting in?",
+    "What state is The Room in?",
+    "Where is The Conversation hosted?",
+    "How can I buy The Conversation?",
+    "How much does a layer cost?",
+    "How much does the master cost?",
+    "How can I buy The Conversation?",
+    "How do I buy a layer?",
+    "How do I buy The Conversation?",
+    "How can I buy The Conversation?",
+    "How do I know if the master is available?",
+    "Is the master layer available?",
+    "What state is the Room in?"
+]
