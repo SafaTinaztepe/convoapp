@@ -6,8 +6,13 @@ import TextContainer from '../TextContainer/TextContainer' ;
 import Messages from '../Messages/Messages';
 import InfoBar from '../InfoBar/InfoBar';
 import Input from '../Input/Input';
+// import Typing from '../Messages/Typing';
 
 import { API, graphqlOperation } from 'aws-amplify';
+
+import CookieConsent from "react-cookie-consent";
+// import CookieConsent, { Cookies } from "react-cookie-consent";
+
 
 import './Chat.css';
 
@@ -22,9 +27,8 @@ const Chat = ({ }) => {
     if(!name) getOrSetName();
   });
 
-  // get from localstorage
-  // if miss, set ip as name
-  // if ip miss, set random integer and hash it
+  // TODO: Migrate to cookies?
+  // https://stackoverflow.com/questions/3220660/local-storage-vs-cookies
   const getOrSetName = () => {
     let name_in = localStorage.getItem("name");
     if (name_in){
@@ -36,7 +40,7 @@ const Chat = ({ }) => {
     
   }
 
-  const getIpHash = (callback) => {
+  const getIpHash = () => {
     let name_in, hash;
     axios.get('https://api.ipify.org?format=json')
          .then((response) =>  {
@@ -72,12 +76,11 @@ const Chat = ({ }) => {
     return str.trim();
   }
 
-  // TODO: have a "..." message block appear while waiting for backend request
-  // TODO: sendPresetMessage user is still broken
   const sendMessage = (message, user) => {
     if(message && !chatIsDisabled) {
       var payload;
-      let u = user | name;
+      let u = localStorage.getItem("name")
+      // let u = user || name;
       let prompt = sanitizeString(message);
       console.log("NAME: " + user)
       setMessages(messages => [ ...messages, {text:message, user:u} ]);
@@ -87,20 +90,23 @@ const Chat = ({ }) => {
       API.get("convorestapi", '/convo', {'queryStringParameters': {'prompt': prompt, 'name':u}})
         .then((response) => {
           // handle success
+          console.log("processing response" + Date.now())
+          // setMessages(messages => [ ...messages, {text:"...", user:'convo'} ]);
           payload = (
             response === "undefined" ?
             "Sorry, I didn't get that." :
             response
-          )
-         })
-        .catch(function (error) {
-          // handle error
-          console.log(error.toJSON());
-          console.log(error.response);
-
-          payload = "I got an error: ";
-        })
-        .then(() => {
+            )
+          })
+          .catch(function (error) {
+            // handle error
+            console.log(error.toJSON());
+            console.log(error.response);
+            
+            payload = "I got an error: ";
+          })
+          .then(() => {
+          console.log("responding" + Date.now())
           setMessages(messages => [ ...messages, {text:payload, user:'convo'} ]);
           setChatIsDisabled(false);
         })
@@ -111,7 +117,11 @@ const Chat = ({ }) => {
     <div className="outerContainer">      
       <div className="container">
           <InfoBar />
-          <Messages messages={messages} name={name} />
+          <Messages 
+            messages={messages} 
+            name={name} 
+            hidden={!chatIsDisabled} 
+          />
           <Input 
             message={message}
             setMessage={setMessage} 
@@ -125,7 +135,22 @@ const Chat = ({ }) => {
         chatIsDisabled={chatIsDisabled}
         name={name}
       />
+      <CookieConsent
+        location="bottom"
+        buttonText="Sure man!!"
+        // cookieName="myAwesomeCookieName2"
+        style={{ background: "#2B373B" }}
+        buttonStyle={{ color: "#4e503b", fontSize: "13px" }}
+        expires={150}
+        overlay
+      >
+        Since we don't make you sign in, we take a hash of your IP address to identify messages.  This process keeps you completely anonymous, but still fulfills our compliance requirements.<br/>
+        Please don't say <strong>mean, racist, sexist</strong> things to Convo.  He is still learning and doing his best.<br/>
+        We only need to store your ip hash, messages you send, Convo's responses, and the fact that you clicked this <u><span onClick={()=>window.location="https://www.youtube.com/watch?v=bxqLsrlakK8"}>button</span></u>.
+      </CookieConsent>
+      <Cookies>
 
+      </Cookies>
     </div>
   );
 }

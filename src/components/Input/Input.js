@@ -10,6 +10,7 @@ const Input = ({ setMessage, sendMessage, message, chatIsDisabled }) => (
       value={message}
       onChange={({ target: { value } }) => setMessage(value)}
       onKeyPress={event => event.key === 'Enter' ? sendMessage(message) : null}
+      maxlength="200"
     />
     <button
       className={`sendButton ${chatIsDisabled ? "disabled" : ""}`}

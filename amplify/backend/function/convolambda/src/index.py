@@ -20,7 +20,7 @@ def handler(event, context):
 
     params = event["queryStringParameters"]
     ssm = boto3.client("ssm")    
-    prompt = params["prompt"]
+    prompt = params["prompt"][:200]
     user = params["name"]
 
     layer_data = ssm.get_parameter(Name="convo_layer_data")["Parameter"]["Value"]
@@ -53,8 +53,8 @@ def handler(event, context):
         training_text += value_string + owner_string
 
     label = classify_content(prompt)
-    print(f"Content Label: {label}")
-    print(f"Prompt: {prompt}")
+    # print(f"Content Label: {label}")
+    # print(f"Prompt: {prompt}")
     if label == "2":
         response = "Be careful about what you say to Convo.  I am a bot, but I still have feelings."
     else:
@@ -65,11 +65,12 @@ def handler(event, context):
             engine="davinci",
             prompt=training_text, # include entire training text
             temperature=0.1, # randomness of responses
-            max_tokens=150, # max length of the reply, training_text+user_prompt+response ≤ 2048
+            max_tokens=100, # max length of the reply, training_text+user_prompt+response ≤ 2048
             top_p=1,
             frequency_penalty=0, # dont repeat terms
             presence_penalty=0,
-            stop=["User: "]
+            stop=["User: ", "Convo: "],
+            user_id=user
         )
         # print(response['choices'])
         if len(response["choices"]) >= 1 and \
@@ -159,7 +160,6 @@ def create_api_call_db(user, message, response):
         print("DB: wrote query")
     else:
         print("DB: failed write")
-
 
 def filter_user_by_restrictions(user):
     user_min_messages  = count_queries_by_user_time(user, grain={'minutes':1})
