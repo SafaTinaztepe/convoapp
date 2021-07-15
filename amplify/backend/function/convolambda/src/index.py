@@ -20,12 +20,12 @@ def handler(event, context):
 
     params = event["queryStringParameters"]
     ssm = boto3.client("ssm")    
-    prompt = params["prompt"]
+    prompt = params["prompt"][:200]
     user = params["name"]
 
     layer_data = ssm.get_parameter(Name="convo_layer_data")["Parameter"]["Value"]
     layer_data = json.loads(layer_data)["data"]["master"]
-    print(layer_data)
+    # print(layer_data)
 
 
     if filter_user_by_restrictions(user):
@@ -52,7 +52,7 @@ def handler(event, context):
         owner_string = f"\nUser: Who is the owner of {i}?\nConvo: The owner of {i} is {owner}."
         training_text += value_string + owner_string
 
-    label = classify_content(prompt)
+    label = classify_content(prompt, user)
     print(f"Content Label: {label}")
     print(f"Prompt: {prompt}")
     if label == "2":
@@ -65,11 +65,12 @@ def handler(event, context):
             engine="davinci",
             prompt=training_text, # include entire training text
             temperature=0.1, # randomness of responses
-            max_tokens=150, # max length of the reply, training_text+user_prompt+response ≤ 2048
+            max_tokens=100, # max length of the reply, training_text+user_prompt+response ≤ 2048
             top_p=1,
             frequency_penalty=0, # dont repeat terms
             presence_penalty=0,
-            stop=["User: "]
+            stop=["User: ", "Convo: "],
+            user=user
         )
         # print(response['choices'])
         if len(response["choices"]) >= 1 and \
@@ -91,7 +92,7 @@ def handler(event, context):
         "isBase64Encoded": False
     }
 
-def classify_content(prompt):
+def classify_content(prompt, user):
     response = openai.Completion.create(
       engine="content-filter-alpha-c4",
       prompt = "<|endoftext|>"+prompt+"\n--\nLabel:",
@@ -101,6 +102,7 @@ def classify_content(prompt):
       frequency_penalty=0,
       presence_penalty=0,
       logprobs=10
+    #   user=user
     )
     output_label = response["choices"][0]["text"]
 
@@ -156,10 +158,10 @@ def create_api_call_db(user, message, response):
     request = requests.post(os.environ['API_CONVOAPP_GRAPHQLAPIENDPOINTOUTPUT'], json={'query': mutation, 'variables':{'input':ApiCall}}, headers=headers)
     if request.status_code == 200:
         # return request.json()
-        print("DB: wrote query")
+        # print("DB: wrote query")
+        pass
     else:
         print("DB: failed write")
-
 
 def filter_user_by_restrictions(user):
     user_min_messages  = count_queries_by_user_time(user, grain={'minutes':1})
@@ -196,7 +198,7 @@ def count_queries_by_user_time(user, grain):
         raise Exception("Query failed to run by returning code of {}. {}".format(request.status_code, query))
 
     n_items = response['data']['listApiCalls']['items']
-    print(f"previous calls: {n_items}")
+    # print(f"previous calls: {n_items}")
 
     return len(n_items)
 
