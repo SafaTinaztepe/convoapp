@@ -6,7 +6,6 @@ import TextContainer from '../TextContainer/TextContainer' ;
 import Messages from '../Messages/Messages';
 import InfoBar from '../InfoBar/InfoBar';
 import Input from '../Input/Input';
-// import Typing from '../Messages/Typing';
 
 import { API, graphqlOperation } from 'aws-amplify';
 
@@ -76,13 +75,13 @@ const Chat = ({ }) => {
     return str.trim();
   }
 
-  const sendMessage = (message, user) => {
+  const sendMessage = (message) => {
     if(message && !chatIsDisabled) {
       var payload;
       let u = localStorage.getItem("name")
       // let u = user || name;
       let prompt = sanitizeString(message);
-      console.log("NAME: " + user)
+      console.log("NAME: " + u)
       setMessages(messages => [ ...messages, {text:message, user:u} ]);
       setMessage("");
       setChatIsDisabled(true);
@@ -90,7 +89,7 @@ const Chat = ({ }) => {
       API.get("convorestapi", '/convo', {'queryStringParameters': {'prompt': prompt, 'name':u}})
         .then((response) => {
           // handle success
-          console.log("processing response" + Date.now())
+          console.log("processing response " + Date.now())
           // setMessages(messages => [ ...messages, {text:"...", user:'convo'} ]);
           payload = (
             response === "undefined" ?
@@ -106,7 +105,7 @@ const Chat = ({ }) => {
             payload = "I got an error: ";
           })
           .then(() => {
-          console.log("responding" + Date.now())
+          console.log("responding " + Date.now())
           setMessages(messages => [ ...messages, {text:payload, user:'convo'} ]);
           setChatIsDisabled(false);
         })
@@ -148,9 +147,6 @@ const Chat = ({ }) => {
         Please don't say <strong>mean, racist, sexist</strong> things to Convo.  He is still learning and doing his best.<br/>
         We only need to store your ip hash, messages you send, Convo's responses, and the fact that you clicked this <u><span onClick={()=>window.location="https://www.youtube.com/watch?v=bxqLsrlakK8"}>button</span></u>.
       </CookieConsent>
-      <Cookies>
-
-      </Cookies>
     </div>
   );
 }
