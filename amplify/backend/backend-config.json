@@ -42,6 +42,16 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "getconvouniques": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "setconvouniques": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "api": {
@@ -67,7 +77,7 @@
       "dependsOn": [
         {
           "category": "function",
-          "resourceName": "convouniques",
+          "resourceName": "convolambda",
           "attributes": [
             "Name",
             "Arn"
@@ -75,7 +85,15 @@
         },
         {
           "category": "function",
-          "resourceName": "convolambda",
+          "resourceName": "getconvouniques",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "setconvouniques",
           "attributes": [
             "Name",
             "Arn"

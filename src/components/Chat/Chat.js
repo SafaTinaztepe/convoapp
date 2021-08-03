@@ -4,6 +4,7 @@ import crypto from "crypto";
 
 import TextContainer from '../TextContainer/TextContainer' ;
 import Messages from '../Messages/Messages';
+import Typing from '../Messages/Typing';
 import InfoBar from '../InfoBar/InfoBar';
 import Input from '../Input/Input';
 
@@ -20,10 +21,28 @@ const Chat = ({ }) => {
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
+  const [timeoutDone, setTimeoutDone] = useState(false);
   const [chatIsDisabled, setChatIsDisabled] = useState(false);
 
+  const welcomeMessage() = () => {
+    
+  }
+
   useEffect(() => {
-    if(!name) getOrSetName();
+    if(!name){
+      getOrSetName();
+    };
+    if(!timeoutDone){
+      let welcomeMessage = "Hi.  Please don't be mean or racist to me.  I am still baby."
+      setChatIsDisabled(true);
+
+      setTimeout(() => {
+        setMessages(messages => [ ...messages, {text:welcomeMessage, user:'convo'} ]);
+      }, 5000)
+      setChatIsDisabled(false)
+      setTimeoutDone(true)
+    }
+    console.log(timeoutDone)
   });
 
   // TODO: Migrate to cookies?
@@ -51,10 +70,8 @@ const Chat = ({ }) => {
             setName(hash)
           })
           .catch((err) => {
-            API.get("convorestapi", "/uniques", {})
-               .then((data) => {
-                  console.log(data)
-                  name_in = data.uniques
+            API.get("convorestapi", "/uniques/set", {})
+               .then((name_in) => {
                   hash = crypto.createHash('sha256')
                                .update(name_in)
                                .digest('hex');  
@@ -81,7 +98,7 @@ const Chat = ({ }) => {
       let u = localStorage.getItem("name")
       // let u = user || name;
       let prompt = sanitizeString(message);
-      console.log("NAME: " + u)
+      // console.log("NAME: " + u)
       setMessages(messages => [ ...messages, {text:message, user:u} ]);
       setMessage("");
       setChatIsDisabled(true);
@@ -134,6 +151,7 @@ const Chat = ({ }) => {
         chatIsDisabled={chatIsDisabled}
         name={name}
       />
+      <div id=" "></div>
       <CookieConsent
         location="bottom"
         buttonText="Sure man!!"
