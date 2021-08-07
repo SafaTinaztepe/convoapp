@@ -14,8 +14,8 @@ const Input = ({ setMessage, sendMessage, message, chatIsDisabled }) => (
     />
     <button
       className={`sendButton ${chatIsDisabled ? "disabled" : ""}`}
-      onClick={e => sendMessage(message)} 
-      disabled={chatIsDisabled}>
+      onClick={() =>{message ? sendMessage(message) : null}}
+      disabled={chatIsDisabled || !message}>
       Send
     </button>
   </form>

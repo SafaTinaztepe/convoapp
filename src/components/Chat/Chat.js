@@ -23,8 +23,10 @@ const Chat = ({ }) => {
   const [messages, setMessages] = useState([]);
   const [timeoutDone, setTimeoutDone] = useState(false);
   const [chatIsDisabled, setChatIsDisabled] = useState(false);
+  const [userSent, setUserSent] = useState(0);
 
-  const welcomeMessage() = () => {
+
+  const welcomeMessage = () => {
     
   }
 
@@ -33,16 +35,23 @@ const Chat = ({ }) => {
       getOrSetName();
     };
     if(!timeoutDone){
+      setChatIsDisabled(true)
       let welcomeMessage = "Hi.  Please don't be mean or racist to me.  I am still baby."
-      setChatIsDisabled(true);
 
       setTimeout(() => {
         setMessages(messages => [ ...messages, {text:welcomeMessage, user:'convo'} ]);
-      }, 5000)
-      setChatIsDisabled(false)
-      setTimeoutDone(true)
+      }, 1000);
+      setChatIsDisabled(false);
+      setTimeoutDone(true);
     }
-    console.log(timeoutDone)
+
+    // Rate limiting
+    // 6 per minute, 60 per hour
+    const interval = setInterval(() => {
+      setUserSent(0);
+    }, 1000*60)
+
+    return () => clearInterval(interval)
   });
 
   // TODO: Migrate to cookies?
@@ -94,11 +103,17 @@ const Chat = ({ }) => {
 
   const sendMessage = (message) => {
     if(message && !chatIsDisabled) {
+      
       var payload;
+      console.log(userSent)
+      if(userSent > 6){
+        payload = "Too many messages sent!  Give me a second to recharge."
+        setMessages(messages => [ ...messages, {text:payload, user:'convo'} ]);
+        return
+      }
+
       let u = localStorage.getItem("name")
-      // let u = user || name;
       let prompt = sanitizeString(message);
-      // console.log("NAME: " + u)
       setMessages(messages => [ ...messages, {text:message, user:u} ]);
       setMessage("");
       setChatIsDisabled(true);
@@ -118,13 +133,12 @@ const Chat = ({ }) => {
             // handle error
             console.log(error.toJSON());
             console.log(error.response);
-            
-            payload = "I got an error: ";
+            payload = "I'm not working right now, sorry!";
           })
           .then(() => {
-          console.log("responding " + Date.now())
-          setMessages(messages => [ ...messages, {text:payload, user:'convo'} ]);
-          setChatIsDisabled(false);
+            setMessages(messages => [ ...messages, {text:payload, user:'convo'} ]);
+            setChatIsDisabled(false);
+            setUserSent(userSent+1);
         })
     }
   }

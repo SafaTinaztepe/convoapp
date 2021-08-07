@@ -3,7 +3,7 @@ config:
   phases:
     - duration: 60
       arrivalRate: 10
-  processor: "./load-test.js"     
+  processor: "./load_test.js"     
   # defaults:
   #   headers:
   #     Authorization: 'Bearer <<enter your valid JWT token>>'

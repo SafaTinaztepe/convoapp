@@ -1,7 +1,4 @@
-        # API_CONVOAPP_GRAPHQLAPIENDPOINTOUTPUT
-        # API_CONVOAPP_GRAPHQLAPIIDOUTPUT
-        # API_CONVOAPP_GRAPHQLAPIKEYOUTPUT
-
+from flask import Flask, request
 import os
 import boto3
 import requests
@@ -9,39 +6,36 @@ import datetime as dt
 import openai
 import json
 
+app = Flask(__name__)
+
 headers = {
-    "host"     : os.environ["API_CONVOAPP_GRAPHQLAPIENDPOINTOUTPUT"].replace("https://", "").replace("/graphql", ""),
-    "x-api-key": os.environ["API_CONVOAPP_GRAPHQLAPIKEYOUTPUT"],
     "content-type": "application/json",
     "Access-Control-Allow-Origin": "*"
 }
+# api_key = os.environ["OPEN_AI"]
+api_key = "sk-l9aZYTbZq7eBa4gs9L2Li7WOY30amDJUSPJ02wRY"
+openai.api_key = api_key
+ssm = boto3.client("ssm")  
+training_text = None
+with open("training_text.txt", "r") as infile:
+    training_text = infile.read()
+layer_data = ssm.get_parameter(Name="convo_layer_data")["Parameter"]["Value"]
+layer_data = json.loads(layer_data)["data"]["master"]
+for i, layer in enumerate(layer_data["layers"]):
+    value = layer["levers"][0]['currentValue']
+    owner = layer["owner"]["id"]
+    value_string = f"\nUser: What is the value of {i}?\nConvo: The value of {i} is {value}."
+    owner_string = f"\nUser: Who is the owner of {i}?\nConvo: The owner of {i} is {owner}."
+    training_text += value_string + owner_string
 
-def handler(event, context):
+@app.route("/convo", methods=['GET'])
+def convo():
+    if not("prompt" in request.args and "name" in request.args):
+        return {"status": 400, "body": "Invalid Parameters"}
 
-    log_messages = False
-    params = event["queryStringParameters"]
-    ssm = boto3.client("ssm")    
+    params = request.args
     prompt = params["prompt"][:200]
     user = params["name"]
-
-    layer_data = ssm.get_parameter(Name="convo_layer_data")["Parameter"]["Value"]
-    layer_data = json.loads(layer_data)["data"]["master"]
-    # print(layer_data)
-
-    api_key = os.environ["OPEN_AI"]
-    openai.api_key = api_key
-
-    with open("training_text.txt", "r") as infile:
-        # training_text = Template(infile.read())
-        training_text = infile.read()
-
-    for i, layer in enumerate(layer_data["layers"]):
-        value = layer["levers"][0]['currentValue']
-        owner = layer["owner"]["id"]
-        value_string = f"\nUser: What is the value of {i}?\nConvo: The value of {i} is {value}."
-        owner_string = f"\nUser: Who is the owner of {i}?\nConvo: The owner of {i} is {owner}."
-        training_text += value_string + owner_string
-
     label = classify_content(prompt, user)
     print(f"Content Label: {label}")
     print(f"Prompt: {prompt}")
@@ -49,28 +43,27 @@ def handler(event, context):
         response = "Be careful about what you say to Convo.  I am a bot, but I still have feelings."
     else:
         training_text += (f"\nUser: {prompt}\nConvo: ")
-
+        return {"text": training_text}
         # print(training_text)
-        response = openai.Completion.create(
-            engine="davinci",
-            prompt=training_text, # include entire training text
-            temperature=0.1, # randomness of responses
-            max_tokens=100, # max length of the reply, training_text+user_prompt+response ≤ 2048
-            top_p=1,
-            frequency_penalty=0, # dont repeat terms
-            presence_penalty=0,
-            stop=["User: ", "Convo: "],
-            user=user
-        )
-        # print(response['choices'])
-        if len(response["choices"]) >= 1 and \
-           len(text_choice:=response["choices"][0]["text"]) > 0:
-            response = text_choice
-        else:
-            response = "I had a little trouble understanding what you said.  You can use full sentences to speak with Convo.  I am a bot."
-    
-    if log_messages:
-        create_api_call_db(user, prompt, response)
+        # response = openai.Completion.create(
+        #     engine="davinci",
+        #     prompt=training_text, # include entire training text
+        #     temperature=0.1, # randomness of responses
+        #     max_tokens=100, # max length of the reply, training_text+user_prompt+response ≤ 2048
+        #     top_p=1,
+        #     frequency_penalty=0, # dont repeat terms
+        #     presence_penalty=0,
+        #     stop=["User: ", "Convo: "],
+        #     user=user
+        # )
+        # # print(response['choices'])
+        # if len(response["choices"]) >= 1 and \
+        #    len(text_choice:=response["choices"][0]["text"]) > 0:
+        #     response = text_choice
+        # else:
+        #     response = "I had a little trouble understanding what you said.  You can use full sentences to speak with Convo.  I am a bot."
+        
+    # create_api_call_db(user, prompt, response)
     
     # Lambda proxy integration
     # means we have to send the entire response object from Lambda
@@ -93,7 +86,7 @@ def classify_content(prompt, user):
       frequency_penalty=0,
       presence_penalty=0,
       logprobs=10
-      user=user
+    #   user=user
     )
     output_label = response["choices"][0]["text"]
 
@@ -135,21 +128,4 @@ def classify_content(prompt, user):
 
     return output_label
 
-def create_api_call_db(user, message, response):
-
-    with open("gql/mutations/create.txt", "r") as infile:
-        mutation = infile.read()
-
-    ApiCall = {
-        'user': user,
-        'message': message,
-        'response': response
-    }
-
-    request = requests.post(os.environ['API_CONVOAPP_GRAPHQLAPIENDPOINTOUTPUT'], json={'query': mutation, 'variables':{'input':ApiCall}}, headers=headers)
-    if request.status_code == 200:
-        # return request.json()
-        # print("DB: wrote query")
-        pass
-    else:
-        print("DB: failed write")
+app.run()

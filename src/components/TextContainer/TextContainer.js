@@ -18,7 +18,7 @@ const TextContainer = ({setMessage, sendMessage, chatIsDisabled, name}) => {
       <li key={i}>
         <button 
           onClick={(event) => sendMessage(message, name)}
-          className="messageBox backgroundOrange"
+          className={`messageBox ${chatIsDisabled ? "backgroundGray" : "backgroundOrange"}`}
           disabled={chatIsDisabled}
         >
           <span className="messageText">
