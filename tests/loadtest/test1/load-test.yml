@@ -1,0 +1,19 @@
+config:
+  target: 'https://br5blc9991.execute-api.us-east-1.amazonaws.com/dev'
+  phases:
+    - duration: 60
+      arrivalRate: 10
+  processor: "./load-test.js"     
+  # defaults:
+  #   headers:
+  #     Authorization: 'Bearer <<enter your valid JWT token>>'
+scenarios:
+  - flow:
+    - function: "generateRandomData"
+    - get:
+        url: "/convo"
+        qs:
+          prompt: "{{ prompt }}"
+          name: "{{ name }}"
+        afterResponse: "handleResponse"
+    - log: "Sent GET request to /convo with {{ prompt }}, {{ name }}"

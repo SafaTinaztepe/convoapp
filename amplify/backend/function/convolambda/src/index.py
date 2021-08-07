@@ -34,7 +34,7 @@ def handler(event, context):
             "headers": {
                 "Access-Control-Allow-Origin": "*"
             },
-            "body": "RateLimitExceeded - Too many reqeusts from this user, give me a minute.",
+            "body": "RateLimitExceeded - Too many requests from this user, give me a minute.",
             "isBase64Encoded": False
         }
 
@@ -197,10 +197,12 @@ def count_queries_by_user_time(user, grain):
     else:
         raise Exception("Query failed to run by returning code of {}. {}".format(request.status_code, query))
 
-    n_items = response['data']['listApiCalls']['items']
-    # print(f"previous calls: {n_items}")
-
-    return len(n_items)
+    try:
+        n_items = response['data']['listApiCalls']['items']
+        return len(n_items)
+    except:
+        return 0
+    
 
 # container to manually override bot responses
 def fork_response():

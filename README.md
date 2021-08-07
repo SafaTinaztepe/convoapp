@@ -18,3 +18,9 @@
 
 # Contract Schema
 - https://thegraph.com/explorer/subgraph/asyncart/async-art?selected=playground
+
+
+## Issue
+- Serverless backend might not work at scale
+- convert to ec2
+- store everything in cloudwatch logs not dynamo db, export to S3
