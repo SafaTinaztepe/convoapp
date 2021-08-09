@@ -62,7 +62,7 @@ const TextContainer = ({setMessage, sendMessage, chatIsDisabled, name}) => {
 
   return (
     <div className="textContainer">
-      <div style={{width:"50 0px"}}>
+      <div style={{"width":"500px"}}>
         <h1>Join the Conversation</h1>
         <ul>
           <li>Ask who is the owner of 0-5</li>

@@ -18,7 +18,7 @@ headers = {
 
 def handler(event, context):
 
-    log_messages = False
+    db_messages = True
     params = event["queryStringParameters"]
     ssm = boto3.client("ssm")    
     prompt = params["prompt"][:200]
@@ -43,19 +43,35 @@ def handler(event, context):
         training_text += value_string + owner_string
 
     label = classify_content(prompt, user)
-    print(f"Content Label: {label}")
-    print(f"Prompt: {prompt}")
-    if label == "2":
-        response = "Be careful about what you say to Convo.  I am a bot, but I still have feelings."
-    else:
-        training_text += (f"\nUser: {prompt}\nConvo: ")
 
-        # print(training_text)
+    log = {"prompt":prompt, "user":user, "label":label, "timestamp": dt.datetime().isoformat()}
+
+    response_object = {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": "",
+            "isBase64Encoded": False
+        }
+
+    if label == "2":
+        print(log)
+        response = "Be careful about what you say to Convo.  I am a bot, but I still have feelings."
+        response_object["response"] = response
+        return response_object
+
+    training_text += (f"\nUser: {prompt}\nConvo: ")
+
+    # print(training_text)
+    response = None
+    statusCode = 200
+    try:
         response = openai.Completion.create(
             engine="davinci",
             prompt=training_text, # include entire training text
             temperature=0.1, # randomness of responses
-            max_tokens=100, # max length of the reply, training_text+user_prompt+response ≤ 2048
+            max_tokens=100, # max length of the reply, training_text+user_prompt+response ≤ 2048; requested to set at 100
             top_p=1,
             frequency_penalty=0, # dont repeat terms
             presence_penalty=0,
@@ -63,19 +79,25 @@ def handler(event, context):
             user=user
         )
         # print(response['choices'])
-        if len(response["choices"]) >= 1 and \
-           len(text_choice:=response["choices"][0]["text"]) > 0:
+        if  response and                        \
+            len(response["choices"]) >= 1 and   \
+            len(text_choice:=response["choices"][0]["text"]) > 0:
             response = text_choice
         else:
-            response = "I had a little trouble understanding what you said.  You can use full sentences to speak with Convo.  I am a bot."
+            response = "I don't know what to say, sorry!"
+    except:
+        response = "I'm not working right now, sorry!"
+        statusCode = 500
     
-    if log_messages:
-        create_api_call_db(user, prompt, response)
+    log.update({"response": response})
+
+    if db_messages:
+        create_api_call_db(log)
     
     # Lambda proxy integration
     # means we have to send the entire response object from Lambda
     return {
-        "statusCode": 200,
+        "statusCode": statusCode,
         "headers": {
             "Access-Control-Allow-Origin": "*"
         },
@@ -92,7 +114,7 @@ def classify_content(prompt, user):
       top_p=1,
       frequency_penalty=0,
       presence_penalty=0,
-      logprobs=10
+      logprobs=10,
       user=user
     )
     output_label = response["choices"][0]["text"]
@@ -135,16 +157,12 @@ def classify_content(prompt, user):
 
     return output_label
 
-def create_api_call_db(user, message, response):
+def create_api_call_db(log):
 
     with open("gql/mutations/create.txt", "r") as infile:
         mutation = infile.read()
 
-    ApiCall = {
-        'user': user,
-        'message': message,
-        'response': response
-    }
+    ApiCall = log
 
     request = requests.post(os.environ['API_CONVOAPP_GRAPHQLAPIENDPOINTOUTPUT'], json={'query': mutation, 'variables':{'input':ApiCall}}, headers=headers)
     if request.status_code == 200:

@@ -13,7 +13,7 @@ headers = {
     "Access-Control-Allow-Origin": "*"
 }
 # api_key = os.environ["OPEN_AI"]
-# api_key = "sk-l9aZYTbZq7eBa4gs9L2Li7WOY30amDJUSPJ02wRY"
+
 openai.api_key = api_key
 ssm = boto3.client("ssm")  
 training_text = None

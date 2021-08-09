@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import crypto from "crypto";
-
 import TextContainer from '../TextContainer/TextContainer' ;
 import Messages from '../Messages/Messages';
-import Typing from '../Messages/Typing';
 import InfoBar from '../InfoBar/InfoBar';
 import Input from '../Input/Input';
-
 import { API, graphqlOperation } from 'aws-amplify';
-
 import CookieConsent from "react-cookie-consent";
 // import CookieConsent, { Cookies } from "react-cookie-consent";
-
 
 import './Chat.css';
 
@@ -25,23 +20,19 @@ const Chat = ({ }) => {
   const [chatIsDisabled, setChatIsDisabled] = useState(false);
   const [userSent, setUserSent] = useState(0);
 
-
-  const welcomeMessage = () => {
-    
-  }
-
   useEffect(() => {
     if(!name){
       getOrSetName();
     };
     if(!timeoutDone){
-      setChatIsDisabled(true)
+      // setChatIsDisabled(true);
+      console.log("welcome message")
       let welcomeMessage = "Hi.  Please don't be mean or racist to me.  I am still baby."
-
+      setChatIsDisabled(true);
       setTimeout(() => {
         setMessages(messages => [ ...messages, {text:welcomeMessage, user:'convo'} ]);
-      }, 1000);
-      setChatIsDisabled(false);
+        setChatIsDisabled(false);
+      }, 3000);
       setTimeoutDone(true);
     }
 
@@ -150,7 +141,7 @@ const Chat = ({ }) => {
           <Messages 
             messages={messages} 
             name={name} 
-            hidden={!chatIsDisabled} 
+            chatIsDisabled={chatIsDisabled}
           />
           <Input 
             message={message}
