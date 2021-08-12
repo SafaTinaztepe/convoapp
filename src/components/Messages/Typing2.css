@@ -1,0 +1,58 @@
+.chat-bubble {
+    /* background-color:#E6F8F1; */
+    padding:16px 28px;
+    -webkit-border-radius: 20px;
+    -webkit-border-bottom-left-radius: 2px;
+    -moz-border-radius: 20px;
+    -moz-border-radius-bottomleft: 2px;
+    border-radius: 20px;
+    border-bottom-left-radius: 2px;
+    display:inline-block;
+}
+.typing {
+  align-items: center;
+  display: flex;
+  height: 17px;
+}
+.typing .dot {
+  animation: typingAnimation 1s infinite ease-in-out alternate;
+  transform-origin: 50% bottom;
+  border-radius: 50%;
+  height: 7px;
+  margin-right: 4px;
+  vertical-align: middle;
+  width: 7px;
+  display: inline-block;
+}
+.typing .dot:nth-child(1) {
+  animation-delay: 200ms;
+}
+.typing .dot:nth-child(2) {
+  animation-delay: 300ms;
+}
+.typing .dot:nth-child(3) {
+  animation-delay: 400ms;
+}
+.typing .dot:last-child {
+  margin-right: 0;
+}
+
+@keyframes typingAnimation {
+
+  0% {
+    /* transform: translateY(0px); */
+    transform: scaleY(1);
+    /* background-color:#6CAD96; */
+    background-color:rgb(233,174,90);
+  }
+  100% {
+    /* transform: translateY(0px); */
+    transform: scaleY(2);
+    /* background-color: #B5D9CB; */
+    background-color: rgb(243,215,180);
+  }
+}
+
+.hide {
+    display: none;
+}

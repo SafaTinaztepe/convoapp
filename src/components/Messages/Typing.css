@@ -16,7 +16,7 @@
     background: #8d8c91;
     border-radius: 50%;
     opacity: 0;
-    animation: loadingFade 1s infinite;
+    /* animation: loadingFade 1s infinite; */
   }
   
   .typing__dot:nth-child(1) {
