@@ -3,6 +3,7 @@ import React from 'react';
 import Chat from './components/Chat/Chat';
 import Home from './components/Home/Home';
 import NavBar from './components/NavBar/NavBar';
+import Footer from './components/Footer/Footer';
 
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 // import { Link } 
@@ -23,6 +24,7 @@ const App = () => {
         {/* <Route path="/" exact component={Join} /> */}
         <Route path="/" exact component={Home} />
         <Route path="/converse" component={Chat} />
+        <Footer/>
       </Router>
     </>
   );

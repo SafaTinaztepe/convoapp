@@ -76,7 +76,7 @@ const TextContainer = ({setMessage, sendMessage, chatIsDisabled, name}) => {
         </ul>
       </div>
       <div>
-        <a id="home-button" href="https://theconversation.app/">Home</a>
+        {/* <a id="home-button" href="https://theconversation.app/">Home</a> */}
       </div>
     </div>
     )

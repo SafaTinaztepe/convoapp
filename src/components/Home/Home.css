@@ -1,0 +1,13 @@
+.heading {
+    text-align: center;
+
+}
+
+.heading h1 {
+    color: rgb(179, 110, 70);
+    font-size: 46px;
+    font-family: Muli sans-serif;
+}
+.heading h3 {
+    color: white;
+}

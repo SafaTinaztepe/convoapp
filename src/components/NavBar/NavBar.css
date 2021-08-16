@@ -1,6 +1,6 @@
 /* Add a black background color to the top navigation */
 .Nav {
-    background-color: #333;
+    /* background-color: #333; */
     overflow: hidden;
     width:100%;
   }
@@ -13,8 +13,13 @@
     padding: 14px 16px;
     text-decoration: none;
     font-size: 17px;
-
+    padding-left: 30px;
+    padding-right: 30px;
     top: 0;
+}
+
+.Nav__brand {
+    float: left !important;
 }
 
 .Nav__right {
@@ -25,12 +30,18 @@
 
 /* Change the color of links on hover */
 .Nav a:hover {
-    background-color: #ddd;
+    background-color: rgb(200, 170, 130);
     color: black;
+    border-radius: 30%;
 }
 
 /* Add a color to the active/current link */
 .Nav a.active {
-    background-color: #04AA6D;
+    background-color: rgb(190, 141, 70);
+    border-radius: 20%;
     color: white;
+}
+
+hr {
+    width: 95%;
 }

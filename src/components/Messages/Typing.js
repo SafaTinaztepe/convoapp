@@ -12,11 +12,11 @@ import "./Message/Message.css";
 //   </div>
 //   )
 const Typing = ({hidden}) => (
-  <div class={`chat-bubble messageContainer justifyStart typing ${hidden?"hide":""}`}>
-    <div class="typing">
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
+  <div className={`chat-bubble messageContainer justifyStart typing ${hidden?"hide":""}`}>
+    <div className="typing">
+      <div className="dot"></div>
+      <div className="dot"></div>
+      <div className="dot"></div>
     </div>
     </div>
   )
