@@ -7,6 +7,8 @@ import InfoBar from '../InfoBar/InfoBar';
 import Input from '../Input/Input';
 import { API, graphqlOperation } from 'aws-amplify';
 import CookieConsent from "react-cookie-consent";
+import ArtContainer from "../ArtContainer/ArtContainer";
+
 // import CookieConsent, { Cookies } from "react-cookie-consent";
 
 import './Chat.css';
@@ -156,6 +158,7 @@ const Chat = ({ }) => {
         chatIsDisabled={chatIsDisabled}
         name={name}
       />
+      <ArtContainer name={name} messages={messages} />
       <div id=" "></div>
       <CookieConsent
         location="bottom"

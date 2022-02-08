@@ -11,7 +11,7 @@
     "@fortawesome/react-fontawesome": "^0.1.14",
     "artillery": "^1.7.6",
     "aws-amplify": "^3.3.24",
-    "aws-sdk": "^2.870.0",
+    "aws-sdk": "^2.1069.0",
     "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",

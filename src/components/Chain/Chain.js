@@ -129,7 +129,9 @@ const _Chain = (props) => {
     const valueOfToken = async (token) => {
       if (contract) {
         // contract.ownerOf(BigNumber.from(732)).then((data) => {console.log(data)}).catch((err) => {console.log(err)})
-        contract.getControlToken(BigNumber.from(token)).then((data) => {console.log(data)}).catch((err) => {console.log(err)})
+        contract.getControlToken(BigNumber.from(token))
+                .then((data) => {console.log(data)})
+                .catch((err) => {console.log(err)})
         // console.log(owner)
       }
     }

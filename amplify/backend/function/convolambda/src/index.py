@@ -35,6 +35,16 @@ def handler(event, context):
         # training_text = Template(infile.read())
         training_text = infile.read()
 
+    if prompt == "print":
+        url = "http://ec2-100-26-221-47.compute-1.amazonaws.com:5000/generate"
+        payload="{\n    \"name\": \"init\",\n    \"prompt\": \"a banana with a hoola hoop in the desert\"\n}"
+        headers = {
+        'Content-Type': 'application/json'
+        }
+        response = requests.request("POST", url, headers=headers, data=payload)
+        return response.json()
+
+
     for i, layer in enumerate(layer_data["layers"]):
         value = layer["levers"][0]['currentValue']
         owner = layer["owner"]["id"]
