@@ -13,7 +13,7 @@ const ArtContainer = ({ name, messages }) => {
         // Needs more feedback, let user know job has been scheduled
         // Skip welcome message
         let prompt = messages.slice(1).map((e) => e.text)
-        let API_ENDPOINT = "http://ec2-52-7-111-32.compute-1.amazonaws.com:5000/generate"
+        let API_ENDPOINT = "api.saftinaz.com:5000/generate"
         let data = {"name":name, "prompt": prompt}
         axios.post(API_ENDPOINT, data)
              .then((data) => console.log(data))
