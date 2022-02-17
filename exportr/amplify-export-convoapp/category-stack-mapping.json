@@ -1,0 +1,57 @@
+[
+  {
+    "category": "hosting",
+    "resourceName": "S3AndCloudFront",
+    "service": "S3AndCloudFront"
+  },
+  {
+    "category": "function",
+    "resourceName": "convolambda",
+    "service": "Lambda"
+  },
+  {
+    "category": "function",
+    "resourceName": "convodata",
+    "service": "Lambda"
+  },
+  {
+    "category": "function",
+    "resourceName": "convouniques",
+    "service": "Lambda"
+  },
+  {
+    "category": "function",
+    "resourceName": "getconvouniques",
+    "service": "Lambda"
+  },
+  {
+    "category": "function",
+    "resourceName": "setconvouniques",
+    "service": "Lambda"
+  },
+  {
+    "category": "function",
+    "resourceName": "S3Triggerbf66215e",
+    "service": "Lambda"
+  },
+  {
+    "category": "api",
+    "resourceName": "convoapp",
+    "service": "AppSync"
+  },
+  {
+    "category": "api",
+    "resourceName": "convorestapi",
+    "service": "API Gateway"
+  },
+  {
+    "category": "auth",
+    "resourceName": "convoappdbce7f6a",
+    "service": "Cognito"
+  },
+  {
+    "category": "storage",
+    "resourceName": "convoimg",
+    "service": "S3"
+  }
+]

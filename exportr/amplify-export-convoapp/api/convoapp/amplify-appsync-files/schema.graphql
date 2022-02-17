@@ -1,0 +1,158 @@
+type ApiCall {
+  id: ID!
+  user: String!
+  message: String!
+  response: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+type ModelApiCallConnection {
+  items: [ApiCall]
+  nextToken: String
+}
+
+input ModelStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelBooleanInput {
+  ne: Boolean
+  eq: Boolean
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelSizeInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+}
+
+input ModelApiCallFilterInput {
+  id: ModelIDInput
+  user: ModelStringInput
+  message: ModelStringInput
+  response: ModelStringInput
+  and: [ModelApiCallFilterInput]
+  or: [ModelApiCallFilterInput]
+  not: ModelApiCallFilterInput
+}
+
+enum ModelAttributeTypes {
+  binary
+  binarySet
+  bool
+  list
+  map
+  number
+  numberSet
+  string
+  stringSet
+  _null
+}
+
+type Query {
+  getApiCall(id: ID!): ApiCall
+  listApiCalls(filter: ModelApiCallFilterInput, limit: Int, nextToken: String): ModelApiCallConnection
+}
+
+input CreateApiCallInput {
+  id: ID
+  user: String!
+  message: String!
+  response: String
+}
+
+input UpdateApiCallInput {
+  id: ID!
+  user: String
+  message: String
+  response: String
+}
+
+input DeleteApiCallInput {
+  id: ID
+}
+
+type Mutation {
+  createApiCall(input: CreateApiCallInput!, condition: ModelApiCallConditionInput): ApiCall
+  updateApiCall(input: UpdateApiCallInput!, condition: ModelApiCallConditionInput): ApiCall
+  deleteApiCall(input: DeleteApiCallInput!, condition: ModelApiCallConditionInput): ApiCall
+}
+
+input ModelApiCallConditionInput {
+  user: ModelStringInput
+  message: ModelStringInput
+  response: ModelStringInput
+  and: [ModelApiCallConditionInput]
+  or: [ModelApiCallConditionInput]
+  not: ModelApiCallConditionInput
+}
+
+type Subscription {
+  onCreateApiCall: ApiCall @aws_subscribe(mutations: ["createApiCall"])
+  onUpdateApiCall: ApiCall @aws_subscribe(mutations: ["updateApiCall"])
+  onDeleteApiCall: ApiCall @aws_subscribe(mutations: ["deleteApiCall"])
+}

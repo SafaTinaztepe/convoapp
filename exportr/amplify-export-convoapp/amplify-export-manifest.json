@@ -1,0 +1,202 @@
+{
+  "stackName": "amplify-convoapp-dev-123418",
+  "props": {
+    "templateFile": "root-stack-template.json",
+    "parameters": {
+      "AuthRoleName": "amplify-convoapp-dev-123418-authRole",
+      "UnauthRoleName": "amplify-convoapp-dev-123418-unauthRole",
+      "DeploymentBucketName": "amplify-convoapp-dev-123418-deployment"
+    },
+    "preserveLogicalIds": true,
+    "loadNestedStacks": {
+      "apiconvoapp": {
+        "templateFile": "api/convoapp/cloudformation-template.json",
+        "parameters": {
+          "CreateAPIKey": 1,
+          "AppSyncApiName": "convoapp",
+          "DynamoDBBillingMode": "PAY_PER_REQUEST",
+          "DynamoDBEnableServerSideEncryption": false,
+          "S3DeploymentBucket": "amplify-convoapp-dev-123418-deployment",
+          "S3DeploymentRootKey": "amplify-appsync-files/00247b8b8d552938c07778042d62d5c52ed3f12f",
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {
+          "ApiCall": {
+            "templateFile": "api/convoapp/amplify-appsync-files/stacks/ApiCall.json",
+            "preserveLogicalIds": true,
+            "loadNestedStacks": {}
+          },
+          "CustomResourcesjson": {
+            "templateFile": "api/convoapp/amplify-appsync-files/stacks/CustomResources.json",
+            "preserveLogicalIds": true,
+            "loadNestedStacks": {}
+          }
+        }
+      },
+      "apiconvorestapi": {
+        "templateFile": "api/convorestapi/convorestapi-cloudformation-template.json",
+        "parameters": {
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      },
+      "authconvoappdbce7f6a": {
+        "templateFile": "auth/convoappdbce7f6a/convoappdbce7f6a-cloudformation-template.json",
+        "parameters": {
+          "identityPoolName": "convoappdbce7f6a_identitypool_dbce7f6a",
+          "allowUnauthenticatedIdentities": true,
+          "resourceNameTruncated": "convoadbce7f6a",
+          "userPoolName": "convoappdbce7f6a_userpool_dbce7f6a",
+          "autoVerifiedAttributes": [
+            "email"
+          ],
+          "mfaConfiguration": "OFF",
+          "mfaTypes": [
+            "SMS Text Message"
+          ],
+          "smsAuthenticationMessage": "Your authentication code is {####}",
+          "smsVerificationMessage": "Your verification code is {####}",
+          "emailVerificationSubject": "Your verification code",
+          "emailVerificationMessage": "Your verification code is {####}",
+          "defaultPasswordPolicy": false,
+          "passwordPolicyMinLength": 8,
+          "passwordPolicyCharacters": [],
+          "requiredAttributes": [
+            "email"
+          ],
+          "aliasAttributes": [],
+          "userpoolClientGenerateSecret": false,
+          "userpoolClientRefreshTokenValidity": 30,
+          "userpoolClientWriteAttributes": [
+            "email"
+          ],
+          "userpoolClientReadAttributes": [
+            "email"
+          ],
+          "userpoolClientLambdaRole": "convoadbce7f6a_userpoolclient_lambda_role",
+          "userpoolClientSetAttributes": false,
+          "sharedId": "dbce7f6a",
+          "resourceName": "convoappdbce7f6a",
+          "authSelections": "identityPoolAndUserPool",
+          "useDefault": "default",
+          "userPoolGroupList": [],
+          "serviceName": "Cognito",
+          "usernameCaseSensitive": false,
+          "useEnabledMfas": false,
+          "breakCircularDependency": false,
+          "dependsOn": [],
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      },
+      "functionS3Triggerbf66215e": {
+        "templateFile": "function/S3Triggerbf66215e/S3Triggerbf66215e-cloudformation-template.json",
+        "parameters": {
+          "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
+          "s3Key": "amplify-builds/S3Triggerbf66215e-6a6d494d6c5a7a647a58-build.zip",
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      },
+      "functionconvodata": {
+        "templateFile": "function/convodata/convodata-cloudformation-template.json",
+        "parameters": {
+          "CloudWatchRule": "rate(5 minutes)",
+          "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
+          "s3Key": "amplify-builds/convodata-66693971316371365762-build.zip",
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      },
+      "functionconvolambda": {
+        "templateFile": "function/convolambda/convolambda-cloudformation-template.json",
+        "parameters": {
+          "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
+          "s3Key": "amplify-builds/convolambda-57316f5863676c784777-build.zip",
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      },
+      "functionconvouniques": {
+        "templateFile": "function/convouniques/convouniques-cloudformation-template.json",
+        "parameters": {
+          "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
+          "s3Key": "amplify-builds/convouniques-47636e31327735784b47-build.zip",
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      },
+      "functiongetconvouniques": {
+        "templateFile": "function/getconvouniques/getconvouniques-cloudformation-template.json",
+        "parameters": {
+          "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
+          "s3Key": "amplify-builds/getconvouniques-765153447077646e6d33-build.zip",
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      },
+      "functionsetconvouniques": {
+        "templateFile": "function/setconvouniques/setconvouniques-cloudformation-template.json",
+        "parameters": {
+          "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
+          "s3Key": "amplify-builds/setconvouniques-524b472b7a2b39386978-build.zip",
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      },
+      "hostingS3AndCloudFront": {
+        "templateFile": "hosting/S3AndCloudFront/template.json",
+        "parameters": {
+          "bucketName": "convoapp-20210312140656-hostingbucket",
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      },
+      "storageconvoimg": {
+        "templateFile": "storage/convoimg/cloudformation-template.json",
+        "parameters": {
+          "bucketName": "convoimages",
+          "selectedGuestPermissions": [
+            "s3:GetObject",
+            "s3:ListBucket"
+          ],
+          "selectedAuthenticatedPermissions": [
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:DeleteObject"
+          ],
+          "triggerFunction": "S3Triggerbf66215e",
+          "s3PrivatePolicy": "Private_policy_ed9c0120",
+          "s3ProtectedPolicy": "Protected_policy_ed9c0120",
+          "s3PublicPolicy": "Public_policy_ed9c0120",
+          "s3ReadPolicy": "read_policy_ed9c0120",
+          "s3UploadsPolicy": "Uploads_policy_ed9c0120",
+          "authPolicyName": "s3_amplify_ed9c0120",
+          "unauthPolicyName": "s3_amplify_ed9c0120",
+          "AuthenticatedAllowList": "ALLOW",
+          "GuestAllowList": "ALLOW",
+          "s3PermissionsAuthenticatedPrivate": "s3:PutObject,s3:GetObject,s3:DeleteObject",
+          "s3PermissionsAuthenticatedProtected": "s3:PutObject,s3:GetObject,s3:DeleteObject",
+          "s3PermissionsAuthenticatedPublic": "s3:PutObject,s3:GetObject,s3:DeleteObject",
+          "s3PermissionsAuthenticatedUploads": "s3:PutObject",
+          "s3PermissionsGuestPublic": "s3:GetObject",
+          "s3PermissionsGuestUploads": "DISALLOW",
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      }
+    }
+  }
+}
