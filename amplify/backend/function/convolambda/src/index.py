@@ -4,7 +4,7 @@
 
 import os
 import boto3
-import requests
+from botocore.vendored import requests
 import datetime as dt
 import openai
 import json

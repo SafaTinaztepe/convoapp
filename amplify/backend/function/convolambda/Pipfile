@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 openai={version="*"}
 boto3={version="*"}
+botocore={version="*"}
 
 [packages]
 src = {editable = true, path = "./src"}
