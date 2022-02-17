@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@aws-amplify/cli": "^5.0.1",
+    "@ethersproject/contracts": "^5.5.0",
     "@ethersproject/providers": "^5.1.0",
     "@ethersproject/units": "^5.1.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
