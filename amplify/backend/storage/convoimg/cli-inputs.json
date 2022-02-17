@@ -1,0 +1,16 @@
+{
+  "resourceName": "convoimg",
+  "policyUUID": "ed9c0120",
+  "bucketName": "convoimages",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "READ"
+  ],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "S3Triggerbf66215e",
+  "groupAccess": {}
+}

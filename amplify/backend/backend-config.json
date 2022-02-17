@@ -52,6 +52,11 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "S3Triggerbf66215e": {
+      "service": "Lambda",
+      "providerPlugin": "awscloudformation",
+      "build": true
     }
   },
   "api": {
@@ -97,6 +102,49 @@
           "attributes": [
             "Name",
             "Arn"
+          ]
+        }
+      ]
+    }
+  },
+  "auth": {
+    "convoappdbce7f6a": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false,
+      "frontendAuthConfig": {
+        "socialProviders": [],
+        "usernameAttributes": [],
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyMinLength": 8,
+          "passwordPolicyCharacters": []
+        },
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      }
+    }
+  },
+  "storage": {
+    "convoimg": {
+      "service": "S3",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "S3Triggerbf66215e",
+          "attributes": [
+            "Name",
+            "Arn",
+            "LambdaExecutionRole"
           ]
         }
       ]

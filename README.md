@@ -2,6 +2,8 @@
 
 ### TODOS
  - frontend design
+ - Enable log in by MetaMask Contract Address
+ - 
 
 # Steps
 ### Activate the virtual environment (required for Amplify cli)

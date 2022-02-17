@@ -28,7 +28,7 @@ const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 5, 42] })
 const Chain = (props) => {
     return (
         <Web3ReactProvider getLibrary={getLibrary}>
-            <_Chain setContract={props.setContract}/>
+            <_Chain setContract={props.setContract} />
         </Web3ReactProvider>
     )
 }
@@ -47,6 +47,13 @@ const _Chain = (props) => {
     let [blockNumber, setBlockNumber] = useState();
     let [ethBalance, setEthBalance] = useState();
     let [contract, setContract] = useState();
+    let [name, setName] = useState();
+
+    useEffect(() => {
+      if(!name){
+        setName(account)
+      }
+    })
 
 
     const updateBlockNumber = (blockNumber) =>  {

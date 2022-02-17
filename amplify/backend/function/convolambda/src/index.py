@@ -8,6 +8,10 @@ import requests
 import datetime as dt
 import openai
 import json
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 headers = {
     "host"     : os.environ["API_CONVOAPP_GRAPHQLAPIENDPOINTOUTPUT"].replace("https://", "").replace("/graphql", ""),
@@ -35,15 +39,6 @@ def handler(event, context):
         # training_text = Template(infile.read())
         training_text = infile.read()
 
-    if prompt == "print":
-        url = "http://ec2-100-26-221-47.compute-1.amazonaws.com:5000/generate"
-        payload="{\n    \"name\": \"init\",\n    \"prompt\": \"a banana with a hoola hoop in the desert\"\n}"
-        headers = {
-        'Content-Type': 'application/json'
-        }
-        response = requests.request("POST", url, headers=headers, data=payload)
-        return response.json()
-
 
     for i, layer in enumerate(layer_data["layers"]):
         value = layer["levers"][0]['currentValue']
@@ -54,7 +49,7 @@ def handler(event, context):
 
     label = classify_content(prompt, user)
 
-    log = {"prompt":prompt, "user":user, "label":label, "timestamp": dt.datetime().isoformat()}
+    log = {"prompt":prompt, "user":user, "label":label, "timestamp": dt.datetime.now().isoformat()}
 
     response_object = {
             "statusCode": 200,
@@ -66,7 +61,7 @@ def handler(event, context):
         }
 
     if label == "2":
-        print(log)
+        logger.info(log)
         response = "Be careful about what you say to Convo.  I am a bot, but I still have feelings."
         response_object["response"] = response
         return response_object
@@ -80,7 +75,7 @@ def handler(event, context):
         response = openai.Completion.create(
             engine="davinci",
             prompt=training_text, # include entire training text
-            temperature=0.1, # randomness of responses
+            temperature=0.5, # randomness of responses
             max_tokens=100, # max length of the reply, training_text+user_prompt+response ≤ 2048; requested to set at 100
             top_p=1,
             frequency_penalty=0, # dont repeat terms
@@ -181,3 +176,4 @@ def create_api_call_db(log):
         pass
     else:
         print("DB: failed write")
+        logger.info("DB failed")

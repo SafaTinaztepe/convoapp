@@ -8,6 +8,14 @@ import Input from '../Input/Input';
 import { API, graphqlOperation } from 'aws-amplify';
 import CookieConsent from "react-cookie-consent";
 import ArtContainer from "../ArtContainer/ArtContainer";
+import Chain from "../Chain/Chain"
+import {
+  Web3ReactProvider,
+  useWeb3React,
+  UnsupportedChainIdError
+} from "@web3-react/core";
+import { InjectedConnector } from '@web3-react/injected-connector'
+
 
 // import CookieConsent, { Cookies } from "react-cookie-consent";
 
@@ -22,11 +30,21 @@ const Chat = ({ }) => {
   const [chatIsDisabled, setChatIsDisabled] = useState(false);
   const [userSent, setUserSent] = useState(0);
 
+  const context = useWeb3React();
+  let { 
+    account,
+    activate
+  } = context;
   useEffect(() => {
     if(!name){
-      getOrSetName();
-    };
-    if(!timeoutDone){
+      let injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 5, 42] })
+
+      activate(injected)
+      console.log(account)
+      setName(account);
+    }
+    
+    if(!timeoutDone && name){
       // setChatIsDisabled(true);
       console.log("welcome message")
       let welcomeMessage = "Hi.  Please don't be mean or racist to me.  I am still baby."
@@ -48,16 +66,22 @@ const Chat = ({ }) => {
   });
 
   // TODO: Migrate to cookies?
+  // TODO: Use login by METAMASK
   // https://stackoverflow.com/questions/3220660/local-storage-vs-cookies
-  const getOrSetName = () => {
-    let name_in = localStorage.getItem("name");
-    if (name_in){
-      console.log("name " + name_in)
-      setName(name_in)
-    } else {
-      getIpHash()
-    }
-    
+  // const getOrSetName = () => {
+  //   let name_in = localStorage.getItem("name");
+  //   if (name_in){
+  //     console.log("name " + name_in)
+  //     setName(name_in)
+  //   } else {
+  //     getIpHash()
+  //   }
+  // }
+
+
+
+  const getUserAddress = () => {
+
   }
 
   const getIpHash = () => {
@@ -107,11 +131,11 @@ const Chat = ({ }) => {
 
       let u = localStorage.getItem("name")
       let prompt = sanitizeString(message);
-      setMessages(messages => [ ...messages, {text:message, user:u} ]);
+      setMessages(messages => [ ...messages, {text:message, user:name} ]);
       setMessage("");
       setChatIsDisabled(true);
 
-      API.get("convorestapi", '/convo', {'queryStringParameters': {'prompt': prompt, 'name':u}})
+      API.get("convorestapi", '/convo', {'queryStringParameters': {'prompt': prompt, 'name':name}})
         .then((response) => {
           // handle success
           console.log("processing response " + Date.now())
@@ -135,7 +159,7 @@ const Chat = ({ }) => {
         })
     }
   }
-
+  
   return (
     <div className="outerContainer">      
       <div className="container">

@@ -9,6 +9,8 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/react-fontawesome": "^0.1.14",
+    "@web3-react/core": "^6.1.9",
+    "@web3-react/injected-connector": "^6.0.7",
     "artillery": "^1.7.6",
     "aws-amplify": "^3.3.24",
     "aws-sdk": "^2.1069.0",

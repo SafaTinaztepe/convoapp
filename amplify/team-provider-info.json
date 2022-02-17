@@ -15,7 +15,7 @@
       "function": {
         "convolambda": {
           "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
-          "s3Key": "amplify-builds/convolambda-3046476e4d586c4e485a-build.zip"
+          "s3Key": "amplify-builds/convolambda-6c363965786643526831-build.zip"
         },
         "convodata": {
           "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
@@ -32,7 +32,15 @@
         "setconvouniques": {
           "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
           "s3Key": "amplify-builds/setconvouniques-524b472b7a2b39386978-build.zip"
+        },
+        "S3Triggerbf66215e": {
+          "deploymentBucketName": "amplify-convoapp-dev-123418-deployment",
+          "s3Key": "amplify-builds/S3Triggerbf66215e-6a6d494d6c5a7a647a58-build.zip"
         }
+      },
+      "auth": {
+        "convoappdbce7f6a": {},
+        "true": {}
       }
     }
   },
